@@ -1,0 +1,62 @@
+[
+    {
+        "role_name": "test role",
+        "role_id": 838959419626094609,
+        "emoji": "\ud83e\udd54",
+        "message_id": 842584980613496833
+    },
+    {
+        "role_name": "Verified Member",
+        "role_id": 838204094782898177,
+        "emoji": "\u2705",
+        "message_id": 842585137052123146
+    },
+    {
+        "role_name": "Male",
+        "role_id": 842117591974936646,
+        "emoji": "\ud83d\udd35",
+        "message_id": 842831932327985182
+    },
+    {
+        "role_name": "Female",
+        "role_id": 842118027733368852,
+        "emoji": "\ud83d\udfe3",
+        "message_id": 842832189179559976
+    },
+    {
+        "role_name": "\ud83d\udd39------Rank Roles------\ud83d\udd39",
+        "role_id": 837889373059022868,
+        "emoji": "\ud83d\udd17",
+        "message_id": 842833257367470090
+    },
+    {
+        "role_name": "\ud83d\udd39------Self Roles------\ud83d\udd39",
+        "role_id": 842117609876357182,
+        "emoji": "\ud83d\udd17",
+        "message_id": 842833472489783326
+    },
+    {
+        "role_name": "Verified Member",
+        "role_id": 838204094782898177,
+        "emoji": "\u2705",
+        "message_id": 844344156032729088
+    },
+    {
+        "role_name": "\ud83d\udd39------Rank Roles------\ud83d\udd39",
+        "role_id": 837889373059022868,
+        "emoji": "\ud83d\udd17",
+        "message_id": 844344299368873995
+    },
+    {
+        "role_name": "\ud83d\udd39------Self Roles------\ud83d\udd39",
+        "role_id": 842117609876357182,
+        "emoji": "\ud83d\udd17",
+        "message_id": 844344431225733141
+    },
+    {
+        "role_name": "Male",
+        "role_id": 809607956827865108,
+        "emoji": "<:technoblade_stressed:838216032510279680>",
+        "message_id": 851920639207407636
+    }
+]

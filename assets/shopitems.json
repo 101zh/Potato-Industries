@@ -1,0 +1,32 @@
+{
+    "Stone Hoe": {
+        "cost": 5000,
+        "sell": 4500,
+        "sticky": false,
+        "description": "Slightly better than the wooden hoe, but still has room for improvement. Farming range is changed from *-50, 50* to *-50, 75*" 
+    },
+    "Iron Hoe": {
+        "cost": 25000,
+        "sell": 22500,
+        "sticky": false,
+        "description": "A fast, reliable farming tool. You feel energised when wielding it. Farming range is changed from *-50, 50* to *-25, 75*" 
+    },
+    "Diamond Hoe": {
+        "cost": 100000,
+        "sell": 90000,
+        "sticky": false,
+        "description": "The shimmering blue blade increases your potato farming abilities. Farming range is changed from *-50, 50* to *-25, 100*" 
+    },
+    "Potato trophy": {
+    "cost": 5000000,
+    "sell": 450000,
+    "sticky": false,
+    "description": "`p!buy 1 potato trophy` Flex your 5mil potatoes with this trophy. Only the rich can afford this."
+    },
+    "Golden Potato": {
+        "cost": 50000,
+        "sell": 45000,
+        "sticky": true,
+        "description": "`p!buy 1 golden potato` The holy golden potato. Can also be collected through digging."
+    }
+}
