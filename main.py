@@ -2579,7 +2579,7 @@ async def rhelp(ctx):
     embedVar.add_field(
         name=f"{prefix}echain [channel_id]",
         value=
-        "`Starts an e-chain channel - more info included in support server: https://discord.gg/vX2JgPQC7W`",
+        "`Starts an e-chain channel (anything message sent but the letter e will be deleted)`",
         inline=False)
     embedVar.add_field(
         name=f"{prefix}jail [member] [role]",
