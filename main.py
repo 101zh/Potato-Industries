@@ -2329,6 +2329,7 @@ async def remrole_error(ctx, error):
 @commands.has_permissions(administrator = True)
 async def addrole(ctx, member: discord.Member, role: discord.Role):
     await member.add_roles(role)
+    await ctx.send("as been unjailed :white_check_mark:")
 
 @addrole.error
 async def addrole_error(ctx, error):
@@ -2428,12 +2429,6 @@ async def shelp(ctx):
         inline=False)
     embedVar.add_field(name=f"{prefix}uptime",
                        value="`Checks PI's uptime`",
-                       inline=False)
-    embedVar.add_field(name=f"{prefix}remrole [member] [role]",
-                       value="`Removes [role] from [member]`",
-                       inline=False)
-    embedVar.add_field(name=f"{prefix}addrole [member] [role]",
-                       value="`Adds [role] to [member]`",
                        inline=False)
     embedVar.add_field(name=f"{prefix}clean [amount]",
                        value="`Purges [amount] messages`",
