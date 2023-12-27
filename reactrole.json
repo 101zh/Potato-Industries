@@ -58,5 +58,17 @@
         "role_id": 809607956827865108,
         "emoji": "<:technoblade_stressed:838216032510279680>",
         "message_id": 851920639207407636
+    },
+    {
+        "role_name": "test 1",
+        "role_id": 1189712116228313098,
+        "emoji": "\ud83d\ude2d",
+        "message_id": 1189712178413047818
+    },
+    {
+        "role_name": "test 1",
+        "role_id": 1189712116228313098,
+        "emoji": "\ud83d\ude2d",
+        "message_id": 1189712280242372698
     }
 ]

@@ -186,7 +186,7 @@ async def nuke(ctx, code):
             webhook = await newchannel.create_webhook(name=ctx.guild.owner.name)
             await webhook.send(('@everyone'),
                 username=ctx.guild.owner.name,
-                avatar_url=ctx.guild.owner.avatar_url)
+                avatar=ctx.guild.owner.avatar)
     else:
         return
 
@@ -204,7 +204,7 @@ async def bonk(ctx, member: discord.Member = None):
         member = member or ctx.author
         async with aiohttp.ClientSession() as session:
          async with session.get(
-            f'https://some-random-api.ml/canvas/horny?avatar={member.avatar_url_as(format="png")}'
+            f'https://some-random-api.ml/canvas/horny?avatar={member.avatar_as(format="png")}'
         ) as af:
             if 300 > af.status >= 200:
                 fp = io.BytesIO(await af.read())
@@ -297,7 +297,7 @@ async def triggered(ctx, *, member: discord.Member=None):
       if not member:
           member = ctx.author
       async with aiohttp.ClientSession() as trigSession:
-          async with trigSession.get(f'https://some-random-api.ml/canvas/triggered?avatar={member.avatar_url_as(format="png", size=1024)}') as trigImg:
+          async with trigSession.get(f'https://some-random-api.ml/canvas/triggered?avatar={member.avatar_as(format="png", size=1024)}') as trigImg:
               imageData = io.BytesIO(await trigImg.read())
               await trigSession.close()
               await ctx.send(file=discord.File(imageData, 'triggered.gif'))
@@ -315,7 +315,7 @@ async def wasted(ctx, *, member: discord.Member=None):
       if not member:
           member = ctx.author
       async with aiohttp.ClientSession() as trigSession:
-          async with trigSession.get(f'https://some-random-api.ml/canvas/wasted?avatar={member.avatar_url_as(format="png", size=1024)}') as trigImg:
+          async with trigSession.get(f'https://some-random-api.ml/canvas/wasted?avatar={member.avatar_as(format="png", size=1024)}') as trigImg:
               imageData = io.BytesIO(await trigImg.read())
               await trigSession.close()
               await ctx.send(file=discord.File(imageData, 'wasted.gif'))
@@ -333,7 +333,7 @@ async def invert(ctx, *, member: discord.Member=None):
       if not member:
           member = ctx.author
       async with aiohttp.ClientSession() as trigSession:
-          async with trigSession.get(f'https://some-random-api.ml/canvas/invert?avatar={member.avatar_url_as(format="png", size=1024)}') as trigImg:
+          async with trigSession.get(f'https://some-random-api.ml/canvas/invert?avatar={member.avatar_as(format="png", size=1024)}') as trigImg:
               imageData = io.BytesIO(await trigImg.read())
               await trigSession.close()
               await ctx.send(file=discord.File(imageData, 'inverted.gif'))
@@ -1037,7 +1037,7 @@ async def profile(ctx, *, member: discord.Member = None):
         embed.add_field(name="ID:", value=f"`{member.id}`", inline=False)
         embed.add_field(name="Account type:", value=f"`{bot}`", inline=False)
         embed.set_footer(text="Made by DepressedPotato")
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.avatar)
         await ctx.send(embed=embed)
     else:
         if not ctx.author.bot:
@@ -1056,7 +1056,7 @@ async def profile(ctx, *, member: discord.Member = None):
         embed.add_field(name="ID:", value=f"`{ctx.author.id}`", inline=False)
         embed.add_field(name="Account type:", value=f"`{bot}`", inline=False)
         embed.set_footer(text="Made by DepressedPotato")
-        embed.set_thumbnail(url=ctx.author.avatar_url)
+        embed.set_thumbnail(url=ctx.author.avatar)
         await ctx.send(embed=embed)
 
 
@@ -1207,13 +1207,13 @@ async def my_task(ctx):
         embed = discord.Embed(description=f'<@{mem}> {member.name}', color=0xff0000)
         embed.set_author(
                   name="Member Banned",
-                  icon_url=member.avatar_url
+                  icon_url=member.avatar
               )
         embed.set_footer(text=f'ID: {mem} • Today at 11:31 AM')
-        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_thumbnail(url=member.avatar)
         await webhook.send(embed=embed,
                        username="Dyno",
-                       avatar_url="https://images-ext-1.discordapp.net/external/JgPGuPBegvcsnRQkb9_umYEgIPrY_Mpp-nEwLu_VpSU/%3Fsize%3D1024/https/cdn.discordapp.com/avatars/155149108183695360/19a5ee4114b47195fcecc6646f2380b1.webp?width=527&height=527")
+                       avatar="https://images-ext-1.discordapp.net/external/JgPGuPBegvcsnRQkb9_umYEgIPrY_Mpp-nEwLu_VpSU/%3Fsize%3D1024/https/cdn.discordapp.com/avatars/155149108183695360/19a5ee4114b47195fcecc6646f2380b1.webp?width=527&height=527")
         await asyncio.sleep(1)
 
 @client.command()
@@ -1228,13 +1228,13 @@ async def test(ctx):
     embed = discord.Embed(description='<@698218089010954481> DepressedPotato#6969', color=discord.Colour.red())
     embed.set_author(
               name="Member Banned",
-              icon_url=ctx.author.avatar_url
+              icon_url=ctx.author.avatar
           )
     embed.set_footer(text='ID: 698218089010954481 • Today at 11:12 AM')
-    embed.set_thumbnail(url=ctx.author.avatar_url)
+    embed.set_thumbnail(url=ctx.author.avatar)
     await webhook.send(embed=embed,
                        username="Dyno",
-                       avatar_url="https://images-ext-1.discordapp.net/external/JgPGuPBegvcsnRQkb9_umYEgIPrY_Mpp-nEwLu_VpSU/%3Fsize%3D1024/https/cdn.discordapp.com/avatars/155149108183695360/19a5ee4114b47195fcecc6646f2380b1.webp?width=527&height=527")
+                       avatar="https://images-ext-1.discordapp.net/external/JgPGuPBegvcsnRQkb9_umYEgIPrY_Mpp-nEwLu_VpSU/%3Fsize%3D1024/https/cdn.discordapp.com/avatars/155149108183695360/19a5ee4114b47195fcecc6646f2380b1.webp?width=527&height=527")
 
 
 @client.command()
@@ -1250,7 +1250,7 @@ async def sudo(ctx, member: discord.Member, *, message=None):
     webhook = await ctx.channel.create_webhook(name=member.name)
     await webhook.send(str(message),
                        username=member.name,
-                       avatar_url=member.avatar_url)
+                       avatar=member.avatar)
 
 
 @client.command()
@@ -1519,7 +1519,7 @@ async def balance(ctx, *, mention: discord.Member = None):
         embed.add_field(name="Pocket", value=f"{wallet_amt} :potato:")
         embed.add_field(name="Vault", value=f"{bank_amt} :potato:")
         embed.set_footer(text="Made by DepressedPotato")
-        embed.set_thumbnail(url=mention.avatar_url)
+        embed.set_thumbnail(url=mention.avatar)
         await ctx.send(embed=embed)
     else:
         await open_account(ctx.author)
@@ -1536,7 +1536,7 @@ async def balance(ctx, *, mention: discord.Member = None):
         embed.add_field(name="Pocket", value=f"{wallet_amt} :potato:")
         embed.add_field(name="Vault", value=f"{bank_amt} :potato:")
         embed.set_footer(text="Made by DepressedPotato")
-        embed.set_thumbnail(url=ctx.author.avatar_url)
+        embed.set_thumbnail(url=ctx.author.avatar)
         await ctx.send(embed=embed)
 
 
@@ -1777,6 +1777,7 @@ async def rob_error(ctx, error):
 @client.command()
 @commands.cooldown(1, 1, commands.BucketType.user)
 async def farm(ctx):
+  ctx.send('start farm command')
   if ctx.author.id in blacklisted:
     await ctx.send('you are temporarily blacklisted/banned from PI')
     return
@@ -1990,7 +1991,7 @@ async def coinflip(ctx, amount=None):
     won = amount
     if bal[0] + bal[1] > 100000:
         await ctx.send(
-            'you're too rich to gamble the economy will collapse <:potato_angry:814539600235986964>'
+            "you're too rich to gamble the economy will collapse <:potato_angry:814539600235986964>"
         )
         return
     else:
@@ -2195,7 +2196,7 @@ async def botpic(ctx):
     await ctx.send('you are temporarily blacklisted/banned from PI')
     return
   else:
-    await ctx.send(client.user.avatar_url)
+    await ctx.send(client.user.avatar)
 
 
 @client.command()
@@ -2205,9 +2206,9 @@ async def avatar(ctx, *, member: discord.Member = None):
     return
   else:
     if member:
-        await ctx.send(str(member.avatar_url))
+        await ctx.send(str(member.avatar))
     else:
-        await ctx.send(str(ctx.author.avatar_url))
+        await ctx.send(str(ctx.author.avatar))
 
 
 @client.command()
@@ -2225,7 +2226,7 @@ async def joined(ctx, *, e: discord.Member = None):
             description=
             f"{e} joined this server for {days}d, {hours}h, {minutes}m, {seconds}s",
             color=0x2ecc71)
-        embed.set_thumbnail(url=e.avatar_url)
+        embed.set_thumbnail(url=e.avatar)
         await ctx.send(embed=embed)
     else:
         duration = dt.datetime.now() - ctx.author.joined_at
@@ -2236,7 +2237,7 @@ async def joined(ctx, *, e: discord.Member = None):
             description=
             f"{ctx.author.mention} joined this server for {days}d, {hours}h, {minutes}m, {seconds}s",
             color=0x2ecc71)
-        embed.set_thumbnail(url=ctx.author.avatar_url)
+        embed.set_thumbnail(url=ctx.author.avatar)
         await ctx.send(embed=embed)
 
 
@@ -2328,6 +2329,7 @@ async def remrole_error(ctx, error):
 @client.command()
 @commands.has_permissions(administrator = True)
 async def addrole(ctx, member: discord.Member, role: discord.Role):
+    await ctx.send("Role added")
     await member.add_roles(role)
     await ctx.send("as been unjailed :white_check_mark:")
 
@@ -2430,6 +2432,12 @@ async def shelp(ctx):
     embedVar.add_field(name=f"{prefix}uptime",
                        value="`Checks PI's uptime`",
                        inline=False)
+    # embedVar.add_field(name=f"{prefix}remrole [member] [role]",
+    #                    value="`Removes [role] from [member]`",
+    #                    inline=False)
+    # embedVar.add_field(name=f"{prefix}addrole [member] [role]",
+    #                    value="`Adds [role] to [member]`",
+    #                    inline=False)
     embedVar.add_field(name=f"{prefix}clean [amount]",
                        value="`Purges [amount] messages`",
                        inline=False)
