@@ -145,7 +145,7 @@ async def use(ctx, amount, *, item=None):
 @nick.error
 async def nick(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that")
+        await ctx.send("You cant do that (u need perms)")
 
 @client.command()
 async def invites(ctx, usr: discord.Member=None):
@@ -579,7 +579,7 @@ async def nickall_error(ctx, error):
     return
   else:
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that")
+        await ctx.send("You cant do that (u need perms)")
 
 
 roles = []
@@ -624,7 +624,7 @@ async def unjail(ctx, member: discord.Member):
 @unjail.error
 async def unjail_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that!")
+        await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command()
@@ -675,7 +675,7 @@ async def jail(ctx, member: discord.Member, *, role: discord.Role = None):
 @jail.error
 async def jail_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that")
+        await ctx.send("You cant do that (u need perms)")
 
 
 @client.command()
@@ -698,7 +698,7 @@ async def prefix(ctx, *, prefix):
 @prefix.error
 async def prefix_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that!")
+        await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command()
@@ -731,7 +731,7 @@ async def slowmode(ctx, seconds):
 @createrole.error
 async def createrole_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that!")
+        await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command()
@@ -747,7 +747,7 @@ async def role(ctx, member: discord.Member, *, role: discord.Role):
 @role.error
 async def role_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that!")
+        await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command()
@@ -859,7 +859,7 @@ async def ban(ctx, member: discord.Member, *, reason=None):
 @ban.error
 async def ban_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that!")
+        await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command()
@@ -876,7 +876,7 @@ async def kick(ctx, member: discord.Member):
 @kick.error
 async def kick_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that!")
+        await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command(pass_context=True)
@@ -894,7 +894,7 @@ async def clean(ctx, limit: int):
 @clean.error
 async def clean_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that!")
+        await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command()
@@ -1147,7 +1147,7 @@ async def echain(ctx, channel_id, mode=None):
 @echain.error
 async def echain_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that!")
+        await ctx.send("You cant do that! (u need perms)")
 
 
 async def buy_this(user, item_name, amount):
@@ -2322,7 +2322,7 @@ async def remrole(ctx, member: discord.Member, *, role: discord.Role):
 @remrole.error
 async def remrole_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that!")
+        await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command()
@@ -2334,7 +2334,7 @@ async def addrole(ctx, member: discord.Member, role: discord.Role):
 @addrole.error
 async def addrole_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that!")
+        await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command()
