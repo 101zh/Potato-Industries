@@ -1572,10 +1572,12 @@ async def beg(ctx):
 @beg.error
 async def beg_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
-        import datetime
-        await ctx.send(f'{datetime.timedelta(seconds=error.retry_after)} (hrs:min:sec:mil) cooldown 30m')
+        msg = 'Slow it down!! Try again in **{:.2f}s** (cooldown: 1min)'.format(
+            error.retry_after)
+        await ctx.send(msg)
     else:
       raise error
+
 
 @client.command()
 @commands.cooldown(1, 3600, commands.BucketType.user)
