@@ -1988,9 +1988,9 @@ async def coinflip(ctx, amount=None):
     await open_account(ctx.author)
     bal = await update_bank(ctx.author)
     won = amount
-    if bal[0] + bal[1] > 250000:
+    if bal[0] + bal[1] > 100000:
         await ctx.send(
-            'You have better things to do with your life than gamble all day <:potato_angry:814539600235986964>'
+            'you're too rich to gamble the economy will collapse <:potato_angry:814539600235986964>'
         )
         return
     else:
