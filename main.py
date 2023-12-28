@@ -326,8 +326,8 @@ async def eval(ctx, *, command):
 
 
 @client.command()
+@commands.is_owner()
 async def blacklist(ctx, id, duration):
-    if ctx.author.id == 698218089010954481 or ctx.author.id == 691009964570968144:
         try:
             botbans.add_blacklist(id, duration)
             returned = botbans.humanize_time(duration)
@@ -340,8 +340,8 @@ async def blacklist(ctx, id, duration):
 
 
 @client.command()
+@commands.is_owner()
 async def unblacklist(ctx, id):
-    if ctx.author.id == 698218089010954481 or ctx.author.id == 691009964570968144:
         try:
             botbans.remove_blacklist(id)
             user = await client.fetch_user(id)
