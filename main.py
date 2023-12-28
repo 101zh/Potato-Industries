@@ -129,7 +129,7 @@ async def use(ctx, amount, *, item=None):
         else:
             await ctx.send("Sorry, you didn't win anything")
     else:
-        await ctx.send("please use a valid item")
+        await ctx.send("please use a valid item or try formatting it like this: `p!use {amount} {item}` \nExample: `p!use 1 lottery potato`")
 
 
 @nick.error
