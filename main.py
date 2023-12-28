@@ -1250,7 +1250,7 @@ async def sudo(ctx, member: discord.Member, *, message=None):
     webhook = await ctx.channel.create_webhook(name=member.name)
     await webhook.send(str(message),
                        username=member.name,
-                       avatar=member.avatar)
+                       avatar_url=member.avatar)
 
 
 @client.command()
