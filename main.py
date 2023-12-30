@@ -557,22 +557,7 @@ async def prefix(ctx, *, prefix):
 async def prefix_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that! (u need perms)")
-
-
-@client.command()
-@commands.has_permissions(administrator=True)
-async def createrole(ctx, color: discord.Colour, *, name):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        role = await ctx.guild.create_role(name=name)
-        await role.edit(server=ctx.guild, role=role, colour=color)
-        await ctx.author.add_roles(role)
-        await ctx.send(
-            f"Successfully created `@{role}` role (automatically assigned to you) :white_check_mark:"
-        )
-
+        
 
 @client.command()
 async def slowmode(ctx, seconds):
@@ -583,13 +568,7 @@ async def slowmode(ctx, seconds):
         seconds = int(seconds)
         await ctx.channel.edit(slowmode_delay=seconds)
         await ctx.send(f"Set the slowmode delay in this channel to {seconds} seconds!")
-
-
-@createrole.error
-async def createrole_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that! (u need perms)")
-
+        
 
 @client.command()
 @commands.has_permissions(administrator=True)
@@ -605,44 +584,6 @@ async def role(ctx, member: discord.Member, *, role: discord.Role):
 async def role_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that! (u need perms)")
-
-
-@client.command()
-@commands.has_permissions(administrator=True)
-async def roleall(ctx, role: discord.Role):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        for i in ctx.guild.members:
-            user = client.get_user(i.id)
-            if user.bot:
-                continue
-            try:
-                await user.add_roles(role)
-            except discord.errors.Forbidden:
-                await ctx.send(f"`i do not have permissions to role {user.name}`")
-                pass
-        await ctx.send(
-            f"Successfully added `{role.name}` to everyone :white_check_mark:"
-        )
-
-
-@client.command()
-@commands.has_permissions(administrator=True)
-async def unroleall(ctx, role: discord.Role):
-    for i in ctx.guild.members:
-        user = client.get_user(i.id)
-        if user.bot:
-            continue
-        try:
-            await user.remove_roles(role)
-        except discord.errors.Forbidden:
-            await ctx.send(f"`i do not have permissions to edit {user.name}'s roles`")
-            pass
-    await ctx.send(
-        f"Successfully removed `{role.name}` from everyone :white_check_mark:"
-    )
 
 
 @client.command()
@@ -1144,142 +1085,6 @@ async def sudo(ctx, member: discord.Member, *, message=None):
             await webhook.delete()
         webhook = await ctx.channel.create_webhook(name=member.name)
         await webhook.send(str(message), username=member.name, avatar_url=member.avatar)
-
-
-@client.command()
-async def hug(ctx, member: discord.Member = None):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        if member:
-            async with aiohttp.ClientSession() as cs:
-                async with cs.get("https://some-random-api.ml/animu/hug") as r:
-                    res = await r.json()
-                    embed = discord.Embed(
-                        description=f"{ctx.author.mention} hugged {member.mention}!",
-                        color=0xC27C0E,
-                    )
-                    embed.set_image(url=res["link"])
-                    message = await ctx.send(embed=embed)
-        elif member == None:
-            await ctx.send(
-                "You need to hug an actual person <:seriously:809518766470987799>"
-            )
-
-
-@client.command()
-async def pat(ctx, member: discord.Member = None):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        if member:
-            async with aiohttp.ClientSession() as cs:
-                async with cs.get("https://some-random-api.ml/animu/pat") as r:
-                    res = await r.json()
-                    embed = discord.Embed(
-                        description=f"{ctx.author.mention} pat {member.mention}!",
-                        color=0xC27C0E,
-                    )
-                    embed.set_image(url=res["link"])
-                    message = await ctx.send(embed=embed)
-        elif member == None:
-            await ctx.send(
-                "You need to pet an actual person <:seriously:809518766470987799>"
-            )
-
-
-@client.command()
-async def catfact(ctx):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        async with aiohttp.ClientSession() as cs:
-            async with cs.get("https://some-random-api.ml/facts/cat") as r:
-                res = await r.json()
-                embed = discord.Embed(title=res["fact"], color=0xC27C0E)
-                async with cs.get("https://some-random-api.ml/img/cat") as r:
-                    res = await r.json()
-                    embed.set_image(url=res["link"])
-                    await ctx.send(embed=embed)
-
-
-@client.command()
-async def koalafact(ctx):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        async with aiohttp.ClientSession() as cs:
-            async with cs.get("https://some-random-api.ml/facts/koala") as r:
-                res = await r.json()
-                embed = discord.Embed(title=res["fact"], color=0xC27C0E)
-                async with cs.get("https://some-random-api.ml/img/koala") as r:
-                    res = await r.json()
-                    embed.set_image(url=res["link"])
-                    await ctx.send(embed=embed)
-
-
-@client.command()
-async def birbfact(ctx):
-    async with aiohttp.ClientSession() as cs:
-        async with cs.get("https://some-random-api.ml/facts/bird") as r:
-            res = await r.json()
-            embed = discord.Embed(title=res["fact"], color=0xC27C0E)
-            async with cs.get("https://some-random-api.ml/img/birb") as r:
-                res = await r.json()
-                embed.set_image(url=res["link"])
-                await ctx.send(embed=embed)
-
-
-@client.command()
-async def foxfact(ctx):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        async with aiohttp.ClientSession() as cs:
-            async with cs.get("https://some-random-api.ml/facts/fox") as r:
-                res = await r.json()
-                embed = discord.Embed(title=res["fact"], color=0xC27C0E)
-                async with cs.get("https://some-random-api.ml/img/fox") as r:
-                    res = await r.json()
-                    embed.set_image(url=res["link"])
-                    await ctx.send(embed=embed)
-
-
-@client.command()
-async def pandafact(ctx):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        async with aiohttp.ClientSession() as cs:
-            async with cs.get("https://some-random-api.ml/facts/panda") as r:
-                res = await r.json()
-                embed = discord.Embed(title=res["fact"], color=0xC27C0E)
-                async with cs.get("https://some-random-api.ml/img/panda") as r:
-                    res = await r.json()
-                    embed.set_image(url=res["link"])
-                    await ctx.send(embed=embed)
-
-
-@client.command()
-async def dogfact(ctx):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        async with aiohttp.ClientSession() as cs:
-            async with cs.get("https://some-random-api.ml/facts/dog") as r:
-                res = await r.json()
-                embed = discord.Embed(title=res["fact"], color=0xC27C0E)
-                async with cs.get("https://some-random-api.ml/img/dog") as r:
-                    res = await r.json()
-                    embed.set_image(url=res["link"])
-                    await ctx.send(embed=embed)
 
 
 @reactrole.error
@@ -2119,37 +1924,7 @@ async def avatar(ctx, *, member: discord.Member = None):
             await ctx.send(str(member.avatar))
         else:
             await ctx.send(str(ctx.author.avatar))
-
-
-@client.command()
-async def joined(ctx, *, e: discord.Member = None):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        if e:
-            duration = dt.datetime.now() - e.joined_at
-            hours, remainder = divmod(int(duration.total_seconds()), 3600)
-            minutes, seconds = divmod(remainder, 60)
-            days, hours = divmod(hours, 24)
-            embed = discord.Embed(
-                description=f"{e} joined this server for {days}d, {hours}h, {minutes}m, {seconds}s",
-                color=0x2ECC71,
-            )
-            embed.set_thumbnail(url=e.avatar)
-            await ctx.send(embed=embed)
-        else:
-            duration = dt.datetime.now() - ctx.author.joined_at
-            hours, remainder = divmod(int(duration.total_seconds()), 3600)
-            minutes, seconds = divmod(remainder, 60)
-            days, hours = divmod(hours, 24)
-            embed = discord.Embed(
-                description=f"{ctx.author.mention} joined this server for {days}d, {hours}h, {minutes}m, {seconds}s",
-                color=0x2ECC71,
-            )
-            embed.set_thumbnail(url=ctx.author.avatar)
-            await ctx.send(embed=embed)
-
+            
 
 @client.command()
 async def customembed(ctx, color: discord.Colour, title, *, description):
@@ -2224,20 +1999,6 @@ async def on_ready():
             name=f"{members} users | {servers} servers | p!help",
         ),
     )
-
-
-@client.command()
-@commands.has_permissions(administrator=True)
-async def remrole(ctx, member: discord.Member, *, role: discord.Role):
-    role = discord.utils.get(ctx.guild, name=role.name)
-    await member.remove_roles(role)
-    await ctx.send(f"Removed `{role.name}` from `{member.name}`")
-
-
-@remrole.error
-async def remrole_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command()
