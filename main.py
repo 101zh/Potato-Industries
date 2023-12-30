@@ -1,6 +1,7 @@
 import discord, os, json, random, aiohttp
 from discord.ext.commands import cooldown, BucketType
-from discord import *
+from discord.ext import commands
+from discord import Guild, Client
 from discord.ext import *
 from datetime import *
 from datetime import datetime
@@ -92,7 +93,7 @@ mainshop = [
     },
 ]
 
-client.launch_time = datetime.utcnow()
+launch_time = datetime.utcnow()
 
 
 blacklisted = []
@@ -133,7 +134,7 @@ async def use(ctx, amount, *, item=None):
 
 
 @nick.error
-async def nick(ctx, error):
+async def nick_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that (u need perms)")
 
@@ -373,7 +374,7 @@ async def uptime(ctx):
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
     else:
-        delta_uptime = datetime.utcnow() - client.launch_time
+        delta_uptime = datetime.utcnow() - launch_time
         hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
         minutes, seconds = divmod(remainder, 60)
         days, hours = divmod(hours, 24)
@@ -414,7 +415,7 @@ async def nickall(ctx, *, name):
                 count += 1
         if count == 0:
             await ctx.send(
-                f"Nickname for {member.mention} successfully changed to `{name}` :white_check_mark:"
+                f"Nickname for {Member.mention} successfully changed to `{name}` :white_check_mark:"
             )
         else:
             await ctx.send(
