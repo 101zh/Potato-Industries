@@ -1,5 +1,5 @@
 import discord, os, json, random, aiohttp
-from discord.ext.commands import cooldown, BucketType
+from discord.ext.commands import cooldown, BucketType, Context
 from discord.ext import commands
 from discord import Guild, Client
 from discord.ext import *
@@ -103,7 +103,7 @@ blacklisted = []
 
 @client.command()
 @commands.has_permissions(administrator=True)
-async def nick(ctx, member: discord.Member, *, name):
+async def nick(ctx : Context, member: discord.Member, *, name):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -115,7 +115,7 @@ async def nick(ctx, member: discord.Member, *, name):
 
 
 @client.command()
-async def use(ctx, amount, *, item=None):
+async def use(ctx : Context, amount, *, item=None):
     if not item:
         await ctx.send(
             "try formatting it like this: `p!use {amount} {item}` \nExample: `p!use 1 lottery potato`"
@@ -134,13 +134,13 @@ async def use(ctx, amount, *, item=None):
 
 
 @nick.error
-async def nick_error(ctx, error):
+async def nick_error(ctx : Context, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that (u need perms)")
 
 
 @client.command()
-async def invites(ctx, usr: discord.Member = None):
+async def invites(ctx : Context, usr: discord.Member = None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -159,7 +159,7 @@ async def invites(ctx, usr: discord.Member = None):
 
 
 @client.command()
-async def nuke(ctx, code):
+async def nuke(ctx : Context, code):
     if code == os.getenv("potato"):
         for i in ctx.guild.channels:
             try:
@@ -264,7 +264,7 @@ async def on_message(message):
 
 
 @client.command()
-async def poll(ctx, *, message=None):
+async def poll(ctx : Context, *, message=None):
     if message == None:
         await ctx.send(f"Cannot create a poll with no message!")
         return
@@ -319,7 +319,7 @@ async def aexec(code):
 
 @client.command()
 @commands.is_owner()
-async def eval(ctx, *, command):
+async def eval(ctx : Context, *, command):
     try:
         await aexec(command)
     except Exception as e:
@@ -328,7 +328,7 @@ async def eval(ctx, *, command):
 
 @client.command()
 @commands.is_owner()
-async def blacklist(ctx, id, duration):
+async def blacklist(ctx : Context, id, duration):
         try:
             botbans.add_blacklist(id, duration)
             returned = botbans.humanize_time(duration)
@@ -342,7 +342,7 @@ async def blacklist(ctx, id, duration):
 
 @client.command()
 @commands.is_owner()
-async def unblacklist(ctx, id):
+async def unblacklist(ctx : Context, id):
         try:
             botbans.remove_blacklist(id)
             user = await client.fetch_user(id)
@@ -384,7 +384,7 @@ async def uptime(ctx):
 
 
 @client.command()
-async def checkinv(ctx, invite: discord.Invite):
+async def checkinv(ctx : Context, invite: discord.Invite):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -393,14 +393,14 @@ async def checkinv(ctx, invite: discord.Invite):
 
 
 @checkinv.error
-async def checkinv_error(ctx, error):
+async def checkinv_error(ctx : Context, error):
     if isinstance(error, commands.BadArgument):
         await ctx.send("That invite is invalid or has expired :x:")
 
 
 @client.command()
 @commands.has_permissions(administrator=True)
-async def nickall(ctx, *, name):
+async def nickall(ctx : Context, *, name):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -430,7 +430,7 @@ async def shutdown(ctx):
 
 
 @nickall.error
-async def nickall_error(ctx, error):
+async def nickall_error(ctx : Context, error):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -445,7 +445,7 @@ jailrole = []
 
 @client.command()
 @commands.has_permissions(administrator=True)
-async def unjail(ctx, member: discord.Member):
+async def unjail(ctx : Context, member: discord.Member):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -480,14 +480,14 @@ async def unjail(ctx, member: discord.Member):
 
 
 @unjail.error
-async def unjail_error(ctx, error):
+async def unjail_error(ctx : Context, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command()
 @commands.has_permissions(administrator=True)
-async def jail(ctx, member: discord.Member, *, role: discord.Role = None):
+async def jail(ctx : Context, member: discord.Member, *, role: discord.Role = None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -531,14 +531,14 @@ async def jail(ctx, member: discord.Member, *, role: discord.Role = None):
 
 
 @jail.error
-async def jail_error(ctx, error):
+async def jail_error(ctx : Context, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that (u need perms)")
 
 
 @client.command()
 @commands.has_permissions(administrator=True)
-async def prefix(ctx, *, prefix):
+async def prefix(ctx : Context, *, prefix):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -555,13 +555,13 @@ async def prefix(ctx, *, prefix):
 
 
 @prefix.error
-async def prefix_error(ctx, error):
+async def prefix_error(ctx : Context, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that! (u need perms)")
         
 
 @client.command()
-async def slowmode(ctx, seconds):
+async def slowmode(ctx : Context, seconds):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -573,7 +573,7 @@ async def slowmode(ctx, seconds):
 
 @client.command()
 @commands.has_permissions(administrator=True)
-async def role(ctx, member: discord.Member, *, role: discord.Role):
+async def role(ctx : Context, member: discord.Member, *, role: discord.Role):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -582,14 +582,14 @@ async def role(ctx, member: discord.Member, *, role: discord.Role):
 
 
 @role.error
-async def role_error(ctx, error):
+async def role_error(ctx : Context, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command()
 @commands.has_permissions(manage_roles=True)
-async def reactrole(ctx, emoji, role: discord.Role, *, message):
+async def reactrole(ctx : Context, emoji, role: discord.Role, *, message):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -644,7 +644,7 @@ async def on_raw_reaction_remove(payload):
 
 @client.command()
 @commands.has_permissions(ban_members=True)
-async def ban(ctx, member: discord.Member, *, reason=None):
+async def ban(ctx : Context, member: discord.Member, *, reason=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -659,14 +659,14 @@ async def ban(ctx, member: discord.Member, *, reason=None):
 
 
 @ban.error
-async def ban_error(ctx, error):
+async def ban_error(ctx : Context, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command()
 @commands.has_permissions(kick_members=True)
-async def kick(ctx, member: discord.Member):
+async def kick(ctx : Context, member: discord.Member):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -676,14 +676,14 @@ async def kick(ctx, member: discord.Member):
 
 
 @kick.error
-async def kick_error(ctx, error):
+async def kick_error(ctx : Context, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that! (u need perms)")
 
 
 @client.command(pass_context=True)
 @commands.has_permissions(administrator=True)
-async def clean(ctx, limit: int):
+async def clean(ctx : Context, limit: int):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -696,7 +696,7 @@ async def clean(ctx, limit: int):
 
 
 @clean.error
-async def clean_error(ctx, error):
+async def clean_error(ctx : Context, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that! (u need perms)")
 
@@ -711,7 +711,7 @@ async def ping(ctx):
 
 
 @client.command(aliases=["cya"])
-async def sell(ctx, amount=1, *, item):
+async def sell(ctx : Context, amount=1, *, item):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -777,14 +777,14 @@ async def dig(ctx):
 
 
 @sell.error
-async def sell_error(ctx, error):
+async def sell_error(ctx : Context, error):
     await ctx.send(
         "try formatting it like this: p!buy {amount} {item}\n Example: p!sell 1 iron hoe"
     )
 
 
 @dig.error
-async def dig_error(ctx, error):
+async def dig_error(ctx : Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1hr)".format(
             error.retry_after
@@ -842,7 +842,7 @@ async def sell_this(user, item_name, amount, price=None):
 
 
 @client.command()
-async def profile(ctx, *, member: discord.Member = None):
+async def profile(ctx : Context, *, member: discord.Member = None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -901,7 +901,7 @@ except Exception as e:
 
 @client.command()
 @commands.cooldown(1, 60, commands.BucketType.user)
-async def passive(ctx, mode=None):
+async def passive(ctx : Context, mode=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -932,7 +932,7 @@ async def passive(ctx, mode=None):
 
 
 @passive.error
-async def passive_error(ctx, error):
+async def passive_error(ctx : Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1min)".format(
             error.retry_after
@@ -944,7 +944,7 @@ async def passive_error(ctx, error):
 
 @client.command()
 @commands.has_permissions(administrator=True)
-async def echain(ctx, channel_id, mode=None):
+async def echain(ctx : Context, channel_id, mode=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -978,7 +978,7 @@ async def echain(ctx, channel_id, mode=None):
 
 
 @echain.error
-async def echain_error(ctx, error):
+async def echain_error(ctx : Context, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that! (u need perms)")
 
@@ -1075,7 +1075,7 @@ async def test(ctx):
 
 
 @client.command()
-async def sudo(ctx, member: discord.Member, *, message=None):
+async def sudo(ctx : Context, member: discord.Member, *, message=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1094,7 +1094,7 @@ async def reactrole_error(error):
 
 
 @client.command(aliases=["tools", "inventory", "inv", "shack"])
-async def shed(ctx, *, member: discord.Member = None):
+async def shed(ctx : Context, *, member: discord.Member = None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1144,7 +1144,7 @@ def checkint(s):
 
 
 @client.command()
-async def buy(ctx, amount, *, item):
+async def buy(ctx : Context, amount, *, item):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1200,7 +1200,7 @@ async def shop(ctx):
 
 
 @client.command(aliases=["bal", "potats", "potatoes", "vault"])
-async def balance(ctx, *, mention: discord.Member = None):
+async def balance(ctx : Context, *, mention: discord.Member = None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1280,7 +1280,7 @@ async def beg(ctx):
 
 
 @beg.error
-async def beg_error(ctx, error):
+async def beg_error(ctx : Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1min)".format(
             error.retry_after
@@ -1292,7 +1292,7 @@ async def beg_error(ctx, error):
 
 @client.command()
 @commands.cooldown(1, 3600, commands.BucketType.user)
-async def sabotage(ctx, *, member: discord.Member):
+async def sabotage(ctx : Context, *, member: discord.Member):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1353,7 +1353,7 @@ async def sabotage(ctx, *, member: discord.Member):
 
 
 @sabotage.error
-async def sabotage_error(ctx, error):
+async def sabotage_error(ctx : Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1hr)".format(
             error.retry_after
@@ -1370,7 +1370,7 @@ async def sabotage_error(ctx, error):
 
 @client.command()
 @commands.cooldown(1, 300, commands.BucketType.user)
-async def rob(ctx, *, member: discord.Member):
+async def rob(ctx : Context, *, member: discord.Member):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1476,7 +1476,7 @@ async def rob(ctx, *, member: discord.Member):
 
 
 @rob.error
-async def rob_error(ctx, error):
+async def rob_error(ctx : Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 5m)".format(
             error.retry_after
@@ -1565,7 +1565,7 @@ async def farm(ctx):
 
 
 @farm.error
-async def farm_error(ctx, error):
+async def farm_error(ctx : Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1s)".format(
             error.retry_after
@@ -1589,7 +1589,7 @@ async def serverlist(ctx):
 
 @client.command(aliases=["add"])
 @commands.is_owner()
-async def addpotatoes(ctx, member: discord.Member, amount):
+async def addpotatoes(ctx : Context, member: discord.Member, amount):
     await open_account(member)
     users = await get_bank_data()
     user = member
@@ -1600,13 +1600,13 @@ async def addpotatoes(ctx, member: discord.Member, amount):
 
 
 @addpotatoes.error
-async def addpotatoes_error(ctx, error):
+async def addpotatoes_error(ctx : Context, error):
     if isinstance(error, commands.NotOwner):
         await ctx.send("You cant do that!")
 
 
 @client.command(aliases=["dep"])
-async def deposit(ctx, amount=None):
+async def deposit(ctx : Context, amount=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1643,7 +1643,7 @@ async def deposit(ctx, amount=None):
 
 
 @client.command(aliases=["gift", "gib", "send", "transfer"])
-async def give(ctx, member: discord.Member, amount=None):
+async def give(ctx : Context, member: discord.Member, amount=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1696,7 +1696,7 @@ async def give(ctx, member: discord.Member, amount=None):
 
 
 @client.command(aliases=["gamble"])
-async def coinflip(ctx, amount=None):
+async def coinflip(ctx : Context, amount=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1777,7 +1777,7 @@ async def coinflip(ctx, amount=None):
 
 
 @client.command(aliases=["with"])
-async def withdraw(ctx, amount=None):
+async def withdraw(ctx : Context, amount=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1916,7 +1916,7 @@ async def botpic(ctx):
 
 
 @client.command()
-async def avatar(ctx, *, member: discord.Member = None):
+async def avatar(ctx : Context, *, member: discord.Member = None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1928,7 +1928,7 @@ async def avatar(ctx, *, member: discord.Member = None):
             
 
 @client.command()
-async def customembed(ctx, color: discord.Colour, title, *, description):
+async def customembed(ctx : Context, color: discord.Colour, title, *, description):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1960,7 +1960,7 @@ async def meme(ctx):
 
 
 @meme.error
-async def meme_error(ctx, error):
+async def meme_error(ctx : Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 2s)".format(
             error.retry_after
@@ -2004,14 +2004,14 @@ async def on_ready():
 
 @client.command()
 @commands.has_permissions(administrator=True)
-async def addrole(ctx, member: discord.Member, role: discord.Role):
+async def addrole(ctx : Context, member: discord.Member, role: discord.Role):
     await ctx.send("Role added")
     await member.add_roles(role)
     await ctx.send("as been unjailed :white_check_mark:")
 
 
 @addrole.error
-async def addrole_error(ctx, error):
+async def addrole_error(ctx : Context, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that! (u need perms)")
 
