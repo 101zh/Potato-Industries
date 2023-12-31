@@ -2031,7 +2031,12 @@ async def guild(ctx : Context):
         id = ctx.guild.id
         memberCount = ctx.guild.member_count
 
-        icon = ctx.guild.icon_url
+        icon = "https://minecraft.fandom.com/wiki/File:Missing_Texture_(anisotropic_filtering)_JE3.png"
+        try:
+            icon = ctx.guild.icon.url
+        except AttributeError:
+            pass
+        
         link = await ctx.channel.create_invite()
 
         embed = discord.Embed(
