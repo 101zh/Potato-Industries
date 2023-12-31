@@ -7,7 +7,7 @@ from discord.ext.commands import Context
 
 class HelpCommands(commands.Cog):
     def __init__(self):
-        pass
+        self = self
 
     @commands.command()
     async def help(self, ctx: Context):
