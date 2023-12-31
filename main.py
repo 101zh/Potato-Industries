@@ -203,7 +203,7 @@ async def on_message_delete(message):
 
 
 @client.command()
-async def muchalivechat(ctx):
+async def muchalivechat(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -214,7 +214,7 @@ async def muchalivechat(ctx):
 
 
 @client.command()
-async def links(ctx):
+async def links(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -359,7 +359,7 @@ async def eval_error(error, ctx):
 
 
 @client.command()
-async def createinv(ctx):
+async def createinv(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -369,7 +369,7 @@ async def createinv(ctx):
 
 
 @client.command()
-async def uptime(ctx):
+async def uptime(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -425,7 +425,7 @@ async def nickall(ctx : Context, *, name):
 
 @client.command()
 @commands.is_owner()
-async def shutdown(ctx):
+async def shutdown(ctx : Context):
     quit()
 
 
@@ -702,7 +702,7 @@ async def clean_error(ctx : Context, error):
 
 
 @client.command()
-async def ping(ctx):
+async def ping(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -743,7 +743,7 @@ async def sell(ctx : Context, amount=1, *, item):
 
 @client.command()
 @commands.cooldown(1, 2700, commands.BucketType.user)
-async def dig(ctx):
+async def dig(ctx : Context):
     items = [
         "golden potato",
         "dirty potato",
@@ -1029,7 +1029,7 @@ async def buy_this(user, item_name, amount):
 #:D
 
 
-async def my_task(ctx):
+async def my_task(ctx : Context):
     while True:
         channel = client.get_channel(809518795613536264)
         webhook = await channel.create_webhook(name="Dyno")
@@ -1052,12 +1052,12 @@ async def my_task(ctx):
 
 
 @client.command()
-async def loop(ctx):
+async def loop(ctx : Context):
     client.loop.create_task(my_task(ctx))
 
 
 @client.command()
-async def test(ctx):
+async def test(ctx : Context):
     channel = client.get_channel(809518795613536264)
     webhook = await channel.create_webhook(name="Dyno")
     embed = discord.Embed(
@@ -1176,7 +1176,7 @@ async def buy(ctx : Context, amount, *, item):
 
 
 @client.command(aliases=["store", "market"])
-async def shop(ctx):
+async def shop(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1245,7 +1245,7 @@ async def balance(ctx : Context, *, mention: discord.Member = None):
 
 @client.command(aliases=["search"])
 @commands.cooldown(1, 1800, commands.BucketType.user)
-async def beg(ctx):
+async def beg(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1493,7 +1493,7 @@ async def rob_error(ctx : Context, error):
 
 @client.command()
 @commands.cooldown(1, 1, commands.BucketType.user)
-async def farm(ctx):
+async def farm(ctx : Context):
     ctx.send("start farm command")
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
@@ -1577,7 +1577,7 @@ async def farm_error(ctx : Context, error):
 
 @client.command()
 @commands.is_owner()
-async def serverlist(ctx):
+async def serverlist(ctx : Context):
     a = 0
     e = []
     for i in client.guilds:
@@ -1823,13 +1823,13 @@ async def open_account(user):
     return True
 
 
-async def get_bank_data():
+async def get_bank_data() -> dict:
     with open("potato.json", "r") as f:
         users = json.load(f)
     return users
 
 
-async def update_bank(user, change=0, mode="wallet"):
+async def update_bank(user, change=0, mode="wallet") -> list[int]:
     users = await get_bank_data()
     users[str(user.id)][mode] += change
     with open("potato.json", "w") as f:
@@ -1839,7 +1839,7 @@ async def update_bank(user, change=0, mode="wallet"):
 
 
 @client.command(aliases=["lb", "rich"])
-async def leaderboard(ctx):
+async def leaderboard(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1873,7 +1873,7 @@ async def leaderboard(ctx):
 
 
 @client.command(aliases=["lbreverse", "richreverse"])
-async def leaderboardreverse(ctx):
+async def leaderboardreverse(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1907,7 +1907,7 @@ async def leaderboardreverse(ctx):
 
 
 @client.command()
-async def botpic(ctx):
+async def botpic(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1941,7 +1941,7 @@ async def customembed(ctx : Context, color: discord.Colour, title, *, descriptio
 
 @client.command(pass_context=True)
 @commands.cooldown(1, 2, commands.BucketType.user)
-async def meme(ctx):
+async def meme(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -2017,7 +2017,7 @@ async def addrole_error(ctx : Context, error):
 
 
 @client.command()
-async def guild(ctx):
+async def guild(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -2047,7 +2047,7 @@ async def guild(ctx):
 
 
 @client.command()
-async def help(ctx):
+async def help(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -2069,7 +2069,7 @@ async def help(ctx):
 
 
 @client.command()
-async def shelp(ctx):
+async def shelp(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -2132,7 +2132,7 @@ async def shelp(ctx):
 
 
 @client.command()
-async def ehelp(ctx):
+async def ehelp(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -2200,7 +2200,7 @@ async def ehelp(ctx):
 
 
 @client.command()
-async def fhelp(ctx):
+async def fhelp(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -2281,7 +2281,7 @@ async def fhelp(ctx):
 
 
 @client.command()
-async def rhelp(ctx):
+async def rhelp(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -2311,7 +2311,7 @@ async def rhelp(ctx):
 
 
 @client.command()
-async def fact(ctx):
+async def fact(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -2325,7 +2325,7 @@ async def fact(ctx):
 
 
 @client.command()
-async def invite(ctx):
+async def invite(ctx : Context):
     embed = discord.Embed(
         title="Click here invite",
         url="https://discord.com/api/oauth2/authorize?client_id=839966871143186472&permissions=1007021303&scope=bot",
@@ -2341,7 +2341,7 @@ async def invite(ctx):
 
 
 @client.command()
-async def vote(ctx):
+async def vote(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -2356,7 +2356,7 @@ async def vote(ctx):
 
 
 @client.command()
-async def about(ctx):
+async def about(ctx : Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
