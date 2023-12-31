@@ -122,61 +122,6 @@ async def use(ctx : Context, amount, *, item=None):
         await ctx.send("please use a valid item or try formatting it like this: `p!use {amount} {item}` \nExample: `p!use 1 lottery potato`")
 
 
-@bot.command()
-async def invites(ctx : Context, usr: discord.Member = None):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        if usr == None:
-            user = ctx.author
-        else:
-            user = usr
-        total_invites = 0
-        for i in await ctx.guild.invites():
-            if i.inviter == user:
-                total_invites += i.uses
-        await ctx.send(
-            f"{user.name} has invited {total_invites} member{'' if total_invites == 1 else 's'}!"
-        )
-
-
-@bot.event
-async def on_message_delete(message):
-    channel = bot.get_channel(839682721374666783)
-    msg = (
-        str(message.author.mention)
-        + " deleted message in "
-        + str(message.channel.name)
-        + ": "
-        + str(message.content)
-    )
-    await channel.send(
-        f"{message.author.name} deleted a message in {message.channel.mention}: `{message.content}`"
-    )
-
-
-@bot.command()
-async def muchalivechat(ctx : Context):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        await ctx.send("yus much alive chat <:yes:809518753254604800>")
-        while True:
-            await ctx.trigger_typing()
-
-
-@bot.command()
-async def links(ctx : Context):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        await ctx.send(
-            "**1. **https://1lib.us FREE BOOK DOWNLOADS\n**2. **https://discord.gg/homeworkhelp HOMEWORK HELP FOR LEGIT ANY SUBJECT"
-        )
-
 
 @bot.event
 async def on_message(message : discord.Message):
@@ -259,32 +204,7 @@ async def poll(ctx : Context, *, message=None):
     await message.add_reaction("<:upvote:809518752353878036>")
     await message.add_reaction("<:downvote:809598448684630036>")
     await message.add_reaction("<:what:807056747951947776>")
-    await message.add_reaction("<:cringe:807062463383863336>")
-
-
-@bot.command()
-async def createinv(ctx : Context):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        link = await ctx.channel.create_invite()
-        await ctx.send("Here is a permanent invite to your server: " + str(link))
-
-
-@bot.command()
-async def checkinv(ctx : Context, invite: discord.Invite):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        await ctx.send("That invite should work :white_check_mark:")
-
-
-@checkinv.error
-async def checkinv_error(ctx : Context, error):
-    if isinstance(error, commands.BadArgument):
-        await ctx.send("That invite is invalid or has expired :x:")        
+    await message.add_reaction("<:cringe:807062463383863336>") 
 
 
 @bot.command(aliases=["cya"])
@@ -517,47 +437,6 @@ async def passive_error(ctx : Context, error):
         await ctx.send(msg)
     else:
         raise error
-
-
-@bot.command()
-@commands.has_permissions(administrator=True)
-async def echain(ctx : Context, channel_id, mode=None):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        if mode == "true":
-            try:
-                channel_id = int(channel_id)
-            except ValueError:
-                await ctx.channel.send("Channel must be all digits")
-                return
-            if channel_id in bot.ids:
-                await ctx.channel.send(f"Channel <#{channel_id}> is already set up.")
-                return
-            bot.ids.add(channel_id)
-            channel2 = bot.get_channel(channel_id)
-            await channel2.edit(slowmode_delay=1)
-            with open("database/channels.json", "w") as f:
-                json.dump(list(bot.ids), f)
-            await ctx.channel.send(f"Successfully set up <#{channel_id}>")
-        elif mode == "false":
-            if ctx.channel.id in bot.ids:
-                await ctx.send(f"<#{ctx.channel.id}> hasnt been set up yet.")
-            else:
-                e = ctx.channel.id
-                bot.ids.remove(e)
-                with open("database/channels.json", "w") as f:
-                    json.dump(list(bot.ids), f)
-                await ctx.send(f"Successfully un-echained <#{channel_id}>")
-        else:
-            await ctx.send("You need to choose either `true` or `false`")
-
-
-@echain.error
-async def echain_error(ctx : Context, error):
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You cant do that! (u need perms)")
 
 
 async def buy_this(user, item_name, amount):
