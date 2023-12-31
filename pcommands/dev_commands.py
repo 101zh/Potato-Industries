@@ -6,6 +6,9 @@ from discord.ext.commands import Context
 import utils.blacklist as botbans
 from datetime import datetime
 
+"""
+Untested
+"""
 
 class StaffCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
