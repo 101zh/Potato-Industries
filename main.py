@@ -10,7 +10,8 @@ from keep_alive import keep_alive
 import io
 import utils.blacklist as botbans
 import asyncio
-from pcommands.help_commands import HelpCommands;
+from pcommands.help_commands import HelpCommands
+from pcommands.dev_commands import StaffCommands, DeveloperCommands
 
 # feel free to change the name of the import whenever you want
 # :0 ty
@@ -662,11 +663,6 @@ async def sudo(ctx : Context, member: discord.Member, *, message=None):
             await webhook.delete()
         webhook = await ctx.channel.create_webhook(name=member.name)
         await webhook.send(str(message), username=member.name, avatar_url=member.avatar)
-
-
-@reactrole.error
-async def reactrole_error(error):
-    await ctx.send(error)
 
 
 @bot.command(aliases=["tools", "inventory", "inv", "shack"])
@@ -1565,7 +1561,13 @@ async def on_guild_join(guild):
 @bot.event
 async def on_ready():
     print(f"{bot.user.name} is ready :D")
+    
+    # Add bot commands (in pcommands)
     await bot.add_cog(HelpCommands())
+    await bot.add_cog(StaffCommands(bot))
+    await bot.add_cog(DeveloperCommands(bot, launch_time))
+    #
+    
     servers = len(bot.guilds)
     members = 0
     for guild in bot.guilds:
