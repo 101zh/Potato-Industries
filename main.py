@@ -16,7 +16,7 @@ import asyncio
 
 
 def get_prefix(client, message):
-    with open("prefixes.json", "r") as f:
+    with open("database/prefixes.json", "r") as f:
         prefixes = json.load(f)
     try:
         return prefixes[str(message.guild.id)]
@@ -247,7 +247,7 @@ async def on_message(message):
             await message.channel.send("e")
     try:
         if message.mentions[0] == client.user:
-            with open("prefixes.json", "r") as f:
+            with open("database/prefixes.json", "r") as f:
                 prefixes = json.load(f)
             pre = prefixes[str(message.guild.id)]
             try:
@@ -543,10 +543,10 @@ async def prefix(ctx : Context, *, prefix):
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
     else:
-        with open("prefixes.json", "r") as f:
+        with open("database/prefixes.json", "r") as f:
             prefixes = json.load(f)
         prefixes[str(ctx.guild.id)] = prefix
-        with open("prefixes.json", "w") as f:
+        with open("database/prefixes.json", "w") as f:
             json.dump(prefixes, f)
         await ctx.send(f"Prefix successfully changed to `{prefix}`")
         await client.get_guild(ctx.guild.id).me.edit(
@@ -597,7 +597,7 @@ async def reactrole(ctx : Context, emoji, role: discord.Role, *, message):
         emb = discord.Embed(description=message, color=0x2ECC71)
         msg = await ctx.channel.send(embed=emb)
         await msg.add_reaction(emoji)
-        with open("reactrole.json") as json_file:
+        with open("database/reactrole.json") as json_file:
             data = json.load(json_file)
             new_react_role = {
                 "role_name": role.name,
@@ -606,7 +606,7 @@ async def reactrole(ctx : Context, emoji, role: discord.Role, *, message):
                 "message_id": msg.id,
             }
             data.append(new_react_role)
-        with open("reactrole.json", "w") as f:
+        with open("database/reactrole.json", "w") as f:
             json.dump(data, f, indent=4)
         await ctx.send(
             f"Successfully created a reaction role for `@{role}` :white_check_mark:"
@@ -618,7 +618,7 @@ async def on_raw_reaction_add(payload):
     if payload.member.bot:
         pass
     else:
-        with open("reactrole.json") as react_file:
+        with open("database/reactrole.json") as react_file:
             data = json.load(react_file)
             for x in data:
                 if x["emoji"] == payload.emoji.name:
@@ -630,7 +630,7 @@ async def on_raw_reaction_add(payload):
 
 @client.event
 async def on_raw_reaction_remove(payload):
-    with open("reactrole.json") as react_file:
+    with open("database/reactrole.json") as react_file:
         data = json.load(react_file)
         for x in data:
             if x["emoji"] == payload.emoji.name:
@@ -833,7 +833,7 @@ async def sell_this(user, item_name, amount, price=None):
     except:
         return [False, 3]
 
-    with open("potato.json", "w") as f:
+    with open("database/potato.json", "w") as f:
         json.dump(users, f)
 
     await update_bank(user, abs(cost), "wallet")
@@ -891,7 +891,7 @@ async def profile(ctx : Context, *, member: discord.Member = None):
 
 
 try:
-    with open("channels.json") as f:
+    with open("database/channels.json") as f:
         client.ids = set(json.load(f))
     print("Loaded channels file")
 except Exception as e:
@@ -914,13 +914,13 @@ async def passive(ctx : Context, mode=None):
                     await ctx.channel.send("You're already passive.")
                     return
                 client.ids.add(ctx.author.id)
-                with open("channels.json", "w") as f:
+                with open("database/channels.json", "w") as f:
                     json.dump(list(client.ids), f)
                 await ctx.channel.send("You're passive now.")
             elif mode == "false" or mode == "off" or mode == "nuh":
                 if ctx.author.id in client.ids:
                     client.ids.remove(ctx.author.id)
-                    with open("channels.json", "w") as f:
+                    with open("database/channels.json", "w") as f:
                         json.dump(list(client.ids), f)
                     await ctx.channel.send("You're now impassive.")
                 else:
@@ -961,7 +961,7 @@ async def echain(ctx : Context, channel_id, mode=None):
             client.ids.add(channel_id)
             channel2 = client.get_channel(channel_id)
             await channel2.edit(slowmode_delay=1)
-            with open("channels.json", "w") as f:
+            with open("database/channels.json", "w") as f:
                 json.dump(list(client.ids), f)
             await ctx.channel.send(f"Successfully set up <#{channel_id}>")
         elif mode == "false":
@@ -970,7 +970,7 @@ async def echain(ctx : Context, channel_id, mode=None):
             else:
                 e = ctx.channel.id
                 client.ids.remove(e)
-                with open("channels.json", "w") as f:
+                with open("database/channels.json", "w") as f:
                     json.dump(list(client.ids), f)
                 await ctx.send(f"Successfully un-echained <#{channel_id}>")
         else:
@@ -1017,7 +1017,7 @@ async def buy_this(user, item_name, amount):
     except:
         obj = {"item": item_name, "amount": amount}
         users[str(user.id)]["shed"] = [obj]
-    with open("potato.json", "w") as f:
+    with open("database/potato.json", "w") as f:
         json.dump(users, f)
     await update_bank(user, cost * -1, "wallet")
     return [True, "Worked"]
@@ -1275,7 +1275,7 @@ async def beg(ctx : Context):
         embed = discord.Embed(description=random.choice(beg_list), color=0x2ECC71)
         await ctx.send(embed=embed)
         users[str(user.id)]["wallet"] += earnings
-        with open("potato.json", "w") as f:
+        with open("database/potato.json", "w") as f:
             json.dump(users, f)
 
 
@@ -1559,7 +1559,7 @@ async def farm(ctx : Context):
             )
             earnings = 696969
         users[str(user.id)]["wallet"] += earnings
-        with open("potato.json", "w") as f:
+        with open("database/potato.json", "w") as f:
             json.dump(users, f)
         await ctx.send(embed=embed)
 
@@ -1594,7 +1594,7 @@ async def addpotatoes(ctx : Context, member: discord.Member, amount):
     users = await get_bank_data()
     user = member
     users[str(user.id)]["wallet"] += int(amount)
-    with open("potato.json", "w") as f:
+    with open("database/potato.json", "w") as f:
         json.dump(users, f)
     await ctx.send(f"Added **{amount}** :potato: to {member.mention}")
 
@@ -1818,13 +1818,13 @@ async def open_account(user):
         users[str(user.id)] = {}
         users[str(user.id)]["wallet"] = 0
         users[str(user.id)]["bank"] = 0
-    with open("potato.json", "w") as f:
+    with open("database/potato.json", "w") as f:
         json.dump(users, f)
     return True
 
 
 async def get_bank_data() -> dict:
-    with open("potato.json", "r") as f:
+    with open("database/potato.json", "r") as f:
         users = json.load(f)
     return users
 
@@ -1832,7 +1832,7 @@ async def get_bank_data() -> dict:
 async def update_bank(user, change=0, mode="wallet") -> list[int]:
     users = await get_bank_data()
     users[str(user.id)][mode] += change
-    with open("potato.json", "w") as f:
+    with open("database/potato.json", "w") as f:
         json.dump(users, f)
     bal = [users[str(user.id)]["wallet"], users[str(user.id)]["bank"]]
     return bal
@@ -1972,10 +1972,10 @@ async def meme_error(ctx : Context, error):
 
 @client.event
 async def on_guild_join(guild):
-    with open("prefixes.json", "r") as f:
+    with open("database/prefixes.json", "r") as f:
         prefixes = json.load(f)
     prefixes[str(guild.id)] = "p!"
-    with open("prefixes.json", "w") as f:
+    with open("database/prefixes.json", "w") as f:
         json.dump(prefixes, f)
     for channel in guild.text_channels:
         if channel.permissions_for(guild.me).send_messages:
@@ -2316,7 +2316,7 @@ async def fact(ctx : Context):
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
     else:
-        with open("random_facts", "r") as f:
+        with open("assets/random_facts", "r") as f:
             read = f.read()
             array = read.split("\n")
             fact = random.choice(array)
