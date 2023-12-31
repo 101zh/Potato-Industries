@@ -2029,7 +2029,6 @@ async def guild(ctx : Context):
 
         owner = ctx.author.guild.owner.mention
         id = ctx.guild.id
-        region = ctx.guild.region
         memberCount = ctx.guild.member_count
 
         icon = ctx.guild.icon_url
@@ -2041,7 +2040,6 @@ async def guild(ctx : Context):
         embed.set_thumbnail(url=icon)
         embed.add_field(name="Owner", value=owner, inline=True)
         embed.add_field(name="Server ID", value=id, inline=True)
-        embed.add_field(name="Region", value=region, inline=True)
         embed.add_field(name="Invite", value=link, inline=True)
         embed.add_field(name="Member Count", value=memberCount, inline=True)
         embed.set_footer(text="Made by DepressedPotato")
