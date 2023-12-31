@@ -1104,15 +1104,17 @@ async def coinflip(ctx: Context, amount=None):
             "You have to enter an amount to play <:seriously:809518766470987799>"
         )
         return
-    
+
     await open_account(ctx.author)
     bal = await update_bank(ctx.author)
-    gamble_amount = amount
-    
-    bal = await update_bank(ctx.author)
-    if amount == "all":
-        gamble_amount=bal[0]
+    gamble_amount = 0
 
+    if amount == "all":
+        gamble_amount = bal[0]
+    else:
+        gamble_amount = int(amount)
+
+    # More Exceptions
     if gamble_amount > bal[0]:
         await ctx.send(
             f"You're too poor to play with {gamble_amount} potatoes <:XD:806659054721564712>"
@@ -1133,7 +1135,8 @@ async def coinflip(ctx: Context, amount=None):
             "what are you doing trying to gamble 0 potatoes <:sus:809828043244961863>"
         )
         return
-        
+    
+    # The actual coinlfip
     coin = random.randint(1, 10)
     if coin < 6:
         await update_bank(ctx.author, +1 * gamble_amount)
