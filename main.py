@@ -10,6 +10,7 @@ from keep_alive import keep_alive
 import io
 import utils.blacklist as botbans
 import asyncio
+from pcommands.help_commands import Help;
 
 # feel free to change the name of the import whenever you want
 # :0 ty
@@ -1989,6 +1990,7 @@ async def on_guild_join(guild):
 @client.event
 async def on_ready():
     print(f"{client.user.name} is ready :D")
+    await client.add_cog(Help(blacklisted))
     servers = len(client.guilds)
     members = 0
     for guild in client.guilds:
@@ -2046,26 +2048,26 @@ async def guild(ctx : Context):
         await ctx.channel.send(embed=embed)
 
 
-@client.command()
-async def help(ctx : Context):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        prefix = ctx.prefix
-        embedVar = discord.Embed(title="`Help Section`", color=0x2ECC71)
-        embedVar.add_field(
-            name="Economy Commands", value=f"{prefix}ehelp", inline=False
-        )
-        embedVar.add_field(name="Fun Commands", value=f"{prefix}fhelp", inline=False)
-        embedVar.add_field(name="Staff Commands", value=f"{prefix}shelp", inline=False)
-        embedVar.add_field(
-            name="Ridiculously Time Consuming Commands",
-            value=f"{prefix}rhelp",
-            inline=False,
-        )
-        embedVar.set_footer(text="Made by DepressedPotato")
-        await ctx.send(embed=embedVar)
+# @client.command()
+# async def help(ctx : Context):
+#     if ctx.author.id in blacklisted:
+#         await ctx.send("you are temporarily blacklisted/banned from PI")
+#         return
+#     else:
+#         prefix = ctx.prefix
+#         embedVar = discord.Embed(title="`Help Section`", color=0x2ECC71)
+#         embedVar.add_field(
+#             name="Economy Commands", value=f"{prefix}ehelp", inline=False
+#         )
+#         embedVar.add_field(name="Fun Commands", value=f"{prefix}fhelp", inline=False)
+#         embedVar.add_field(name="Staff Commands", value=f"{prefix}shelp", inline=False)
+#         embedVar.add_field(
+#             name="Ridiculously Time Consuming Commands",
+#             value=f"{prefix}rhelp",
+#             inline=False,
+#         )
+#         embedVar.set_footer(text="Made by DepressedPotato")
+#         await ctx.send(embed=embedVar)
 
 
 @client.command()
