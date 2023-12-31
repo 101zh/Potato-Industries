@@ -406,6 +406,7 @@ async def passive(ctx: Context, mode=None):
     else:
         if mode == None:
             await ctx.send("You need to pick either `true` or `false`")
+            passive.reset_cooldown(ctx)
         else:
             if mode == "true" or mode == "on" or mode == "yuh":
                 if ctx.author.id in bot.ids:
@@ -427,6 +428,7 @@ async def passive(ctx: Context, mode=None):
                 await ctx.send(
                     "You need to pick from one of these: `true/false, on/off, yuh/nuh`"
                 )
+                passive.reset_cooldown(ctx)
 
 
 @passive.error
