@@ -104,7 +104,7 @@ blacklisted = []
 
 
 @bot.command()
-async def use(ctx : Context, amount, *, item=None):
+async def use(ctx: Context, amount, *, item=None):
     if not item:
         await ctx.send(
             "try formatting it like this: `p!use {amount} {item}` \nExample: `p!use 1 lottery potato`"
@@ -119,12 +119,13 @@ async def use(ctx : Context, amount, *, item=None):
         else:
             await ctx.send("Sorry, you didn't win anything")
     else:
-        await ctx.send("please use a valid item or try formatting it like this: `p!use {amount} {item}` \nExample: `p!use 1 lottery potato`")
-
+        await ctx.send(
+            "please use a valid item or try formatting it like this: `p!use {amount} {item}` \nExample: `p!use 1 lottery potato`"
+        )
 
 
 @bot.event
-async def on_message(message : discord.Message):
+async def on_message(message: discord.Message):
     # Implementing botban check.
     # ok
     if message.content.startswith("p!") and message.author != bot.user:
@@ -163,7 +164,7 @@ async def on_message(message : discord.Message):
 
 
 @bot.command()
-async def poll(ctx : Context, *, message=None):
+async def poll(ctx: Context, *, message=None):
     if message == None:
         await ctx.send(f"Cannot create a poll with no message!")
         return
@@ -204,11 +205,11 @@ async def poll(ctx : Context, *, message=None):
     await message.add_reaction("<:upvote:809518752353878036>")
     await message.add_reaction("<:downvote:809598448684630036>")
     await message.add_reaction("<:what:807056747951947776>")
-    await message.add_reaction("<:cringe:807062463383863336>") 
+    await message.add_reaction("<:cringe:807062463383863336>")
 
 
 @bot.command(aliases=["cya"])
-async def sell(ctx : Context, amount=1, *, item):
+async def sell(ctx: Context, amount=1, *, item):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -240,7 +241,7 @@ async def sell(ctx : Context, amount=1, *, item):
 
 @bot.command()
 @commands.cooldown(1, 2700, commands.BucketType.user)
-async def dig(ctx : Context):
+async def dig(ctx: Context):
     items = [
         "golden potato",
         "dirty potato",
@@ -274,14 +275,14 @@ async def dig(ctx : Context):
 
 
 @sell.error
-async def sell_error(ctx : Context, error):
+async def sell_error(ctx: Context, error):
     await ctx.send(
         "try formatting it like this: p!buy {amount} {item}\n Example: p!sell 1 iron hoe"
     )
 
 
 @dig.error
-async def dig_error(ctx : Context, error):
+async def dig_error(ctx: Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1hr)".format(
             error.retry_after
@@ -339,7 +340,7 @@ async def sell_this(user, item_name, amount, price=None):
 
 
 @bot.command()
-async def profile(ctx : Context, *, member: discord.Member = None):
+async def profile(ctx: Context, *, member: discord.Member = None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -398,7 +399,7 @@ except Exception as e:
 
 @bot.command()
 @commands.cooldown(1, 60, commands.BucketType.user)
-async def passive(ctx : Context, mode=None):
+async def passive(ctx: Context, mode=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -429,7 +430,7 @@ async def passive(ctx : Context, mode=None):
 
 
 @passive.error
-async def passive_error(ctx : Context, error):
+async def passive_error(ctx: Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1min)".format(
             error.retry_after
@@ -479,59 +480,8 @@ async def buy_this(user, item_name, amount):
     return [True, "Worked"]
 
 
-# is this a logger
-# well no its a troll ig
-# very funny
-#:D
-
-
-async def my_task(ctx : Context):
-    while True:
-        channel = bot.get_channel(809518795613536264)
-        webhook = await channel.create_webhook(name="Dyno")
-        guild = channel.guild
-        for i in guild.members:
-            memberlist = []
-            memberlist.append(i.id)
-        mem = random.choice(memberlist)
-        member = bot.get_user(mem)
-        embed = discord.Embed(description=f"<@{mem}> {member.name}", color=0xFF0000)
-        embed.set_author(name="Member Banned", icon_url=member.avatar)
-        embed.set_footer(text=f"ID: {mem} • Today at 11:31 AM")
-        embed.set_thumbnail(url=member.avatar)
-        await webhook.send(
-            embed=embed,
-            username="Dyno",
-            avatar="https://images-ext-1.discordapp.net/external/JgPGuPBegvcsnRQkb9_umYEgIPrY_Mpp-nEwLu_VpSU/%3Fsize%3D1024/https/cdn.discordapp.com/avatars/155149108183695360/19a5ee4114b47195fcecc6646f2380b1.webp?width=527&height=527",
-        )
-        await asyncio.sleep(1)
-
-
 @bot.command()
-async def loop(ctx : Context):
-    bot.loop.create_task(my_task(ctx))
-
-
-@bot.command()
-async def test(ctx : Context):
-    channel = bot.get_channel(809518795613536264)
-    webhook = await channel.create_webhook(name="Dyno")
-    embed = discord.Embed(
-        description="<@698218089010954481> DepressedPotato#6969",
-        color=discord.Colour.red(),
-    )
-    embed.set_author(name="Member Banned", icon_url=ctx.author.avatar)
-    embed.set_footer(text="ID: 698218089010954481 • Today at 11:12 AM")
-    embed.set_thumbnail(url=ctx.author.avatar)
-    await webhook.send(
-        embed=embed,
-        username="Dyno",
-        avatar="https://images-ext-1.discordapp.net/external/JgPGuPBegvcsnRQkb9_umYEgIPrY_Mpp-nEwLu_VpSU/%3Fsize%3D1024/https/cdn.discordapp.com/avatars/155149108183695360/19a5ee4114b47195fcecc6646f2380b1.webp?width=527&height=527",
-    )
-
-
-@bot.command()
-async def sudo(ctx : Context, member: discord.Member, *, message=None):
+async def sudo(ctx: Context, member: discord.Member, *, message=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -545,7 +495,7 @@ async def sudo(ctx : Context, member: discord.Member, *, message=None):
 
 
 @bot.command(aliases=["tools", "inventory", "inv", "shack"])
-async def shed(ctx : Context, *, member: discord.Member = None):
+async def shed(ctx: Context, *, member: discord.Member = None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -595,7 +545,7 @@ def checkint(s):
 
 
 @bot.command()
-async def buy(ctx : Context, amount, *, item):
+async def buy(ctx: Context, amount, *, item):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -627,7 +577,7 @@ async def buy(ctx : Context, amount, *, item):
 
 
 @bot.command(aliases=["store", "market"])
-async def shop(ctx : Context):
+async def shop(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -651,7 +601,7 @@ async def shop(ctx : Context):
 
 
 @bot.command(aliases=["bal", "potats", "potatoes", "vault"])
-async def balance(ctx : Context, *, mention: discord.Member = None):
+async def balance(ctx: Context, *, mention: discord.Member = None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -696,7 +646,7 @@ async def balance(ctx : Context, *, mention: discord.Member = None):
 
 @bot.command(aliases=["search"])
 @commands.cooldown(1, 1800, commands.BucketType.user)
-async def beg(ctx : Context):
+async def beg(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -731,7 +681,7 @@ async def beg(ctx : Context):
 
 
 @beg.error
-async def beg_error(ctx : Context, error):
+async def beg_error(ctx: Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1min)".format(
             error.retry_after
@@ -743,7 +693,7 @@ async def beg_error(ctx : Context, error):
 
 @bot.command()
 @commands.cooldown(1, 3600, commands.BucketType.user)
-async def sabotage(ctx : Context, *, member: discord.Member):
+async def sabotage(ctx: Context, *, member: discord.Member):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -804,7 +754,7 @@ async def sabotage(ctx : Context, *, member: discord.Member):
 
 
 @sabotage.error
-async def sabotage_error(ctx : Context, error):
+async def sabotage_error(ctx: Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1hr)".format(
             error.retry_after
@@ -821,7 +771,7 @@ async def sabotage_error(ctx : Context, error):
 
 @bot.command()
 @commands.cooldown(1, 300, commands.BucketType.user)
-async def rob(ctx : Context, *, member: discord.Member):
+async def rob(ctx: Context, *, member: discord.Member):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -927,7 +877,7 @@ async def rob(ctx : Context, *, member: discord.Member):
 
 
 @rob.error
-async def rob_error(ctx : Context, error):
+async def rob_error(ctx: Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 5m)".format(
             error.retry_after
@@ -944,7 +894,7 @@ async def rob_error(ctx : Context, error):
 
 @bot.command()
 @commands.cooldown(1, 1, commands.BucketType.user)
-async def farm(ctx : Context):
+async def farm(ctx: Context):
     ctx.send("start farm command")
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
@@ -1016,7 +966,7 @@ async def farm(ctx : Context):
 
 
 @farm.error
-async def farm_error(ctx : Context, error):
+async def farm_error(ctx: Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1s)".format(
             error.retry_after
@@ -1028,7 +978,7 @@ async def farm_error(ctx : Context, error):
 
 @bot.command()
 @commands.is_owner()
-async def serverlist(ctx : Context):
+async def serverlist(ctx: Context):
     a = 0
     e = []
     for i in bot.guilds:
@@ -1040,7 +990,7 @@ async def serverlist(ctx : Context):
 
 @bot.command(aliases=["add"])
 @commands.is_owner()
-async def addpotatoes(ctx : Context, member: discord.Member, amount):
+async def addpotatoes(ctx: Context, member: discord.Member, amount):
     await open_account(member)
     users = await get_bank_data()
     user = member
@@ -1051,13 +1001,13 @@ async def addpotatoes(ctx : Context, member: discord.Member, amount):
 
 
 @addpotatoes.error
-async def addpotatoes_error(ctx : Context, error):
+async def addpotatoes_error(ctx: Context, error):
     if isinstance(error, commands.NotOwner):
         await ctx.send("You cant do that!")
 
 
 @bot.command(aliases=["dep"])
-async def deposit(ctx : Context, amount=None):
+async def deposit(ctx: Context, amount=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1094,7 +1044,7 @@ async def deposit(ctx : Context, amount=None):
 
 
 @bot.command(aliases=["gift", "gib", "send", "transfer"])
-async def give(ctx : Context, member: discord.Member, amount=None):
+async def give(ctx: Context, member: discord.Member, amount=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1147,88 +1097,62 @@ async def give(ctx : Context, member: discord.Member, amount=None):
 
 
 @bot.command(aliases=["gamble"])
-async def coinflip(ctx : Context, amount=None):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
+async def coinflip(ctx: Context, amount=None):
+    # Exceptions
+    if amount == None:
+        await ctx.send(
+            "You have to enter an amount to play <:seriously:809518766470987799>"
+        )
         return
+    
+    await open_account(ctx.author)
+    bal = await update_bank(ctx.author)
+    gamble_amount = amount
+    
+    bal = await update_bank(ctx.author)
+    if amount == "all":
+        gamble_amount=bal[0]
+
+    if gamble_amount > bal[0]:
+        await ctx.send(
+            f"You're too poor to play with {gamble_amount} potatoes <:XD:806659054721564712>"
+        )
+        return
+    elif gamble_amount < 0:
+        await ctx.send(
+            "How the hecc u think you can play with negative potatoes <:pepe_hehe:816898198315597834>"
+        )
+        return
+    elif gamble_amount > 100000:
+        await ctx.send(
+            "youre gambling too much the economy will collapse :potato_angry:"
+        )
+        return
+    elif gamble_amount == 0:
+        await ctx.send(
+            "what are you doing trying to gamble 0 potatoes <:sus:809828043244961863>"
+        )
+        return
+        
+    coin = random.randint(1, 10)
+    if coin < 6:
+        await update_bank(ctx.author, +1 * gamble_amount)
+        embed = discord.Embed(
+            title=f"You won **{gamble_amount}** :potato: \:D", color=0x3498DB
+        )
+        embed.set_footer(text="thats pretty pog ngl")
+        await ctx.send(embed=embed)
     else:
-        await open_account(ctx.author)
-        bal = await update_bank(ctx.author)
-        won = amount
-        if bal[0] + bal[1] > 100000:
-            await ctx.send(
-                "you're too rich to gamble the economy will collapse <:potato_angry:814539600235986964>"
-            )
-            return
-        else:
-            if amount == None:
-                await ctx.send(
-                    "You have to enter an amount to play <:seriously:809518766470987799>"
-                )
-                return
-            bal = await update_bank(ctx.author)
-            if amount == "all":
-                if bal[0] == 0:
-                    await ctx.send(
-                        "what are you doing trying to gamble 0 potatoes <:sus:809828043244961863>"
-                    )
-                    return
-                if bal[0] < 0:
-                    await ctx.send(
-                        "dang u have negative potatoes lol sadly u cant gamble with negative potatoes <:potato_ummmm:819025209428410388>"
-                    )
-                    return
-                else:
-                    a = random.randint(1, 10)
-                    if a < 6:
-                        await update_bank(ctx.author, +1 * int(bal[0]))
-                        embed = discord.Embed(
-                            title=f"You won **{bal[0]}** :potato: \:D", color=0x3498DB
-                        )
-                        embed.set_footer(text="thats pretty pog ngl")
-                        await ctx.send(embed=embed)
-                    else:
-                        await update_bank(ctx.author, -1 * int(bal[0]))
-                        embed = discord.Embed(
-                            title=f"You lost **{bal[0]}** :potato: ;-;", color=0x3498DB
-                        )
-                        embed.set_footer(text="lol imagine losing in a coin flip")
-                        await ctx.send(embed=embed)
-            amount = int(amount)
-            if amount > bal[0]:
-                await ctx.send(
-                    f"You're too poor to play with {amount} potatoes <:XD:806659054721564712>"
-                )
-                return
-            if amount < 0:
-                await ctx.send(
-                    "How the hecc u think you can play with negative potatoes <:pepe_hehe:816898198315597834>"
-                )
-                return
-            if amount == 0:
-                await ctx.send(
-                    "what are you doing trying to gamble 0 potatoes <:sus:809828043244961863>"
-                )
-                return
-            a = random.randint(1, 10)
-            if a < 6:
-                await update_bank(ctx.author, +1 * amount)
-                embed = discord.Embed(
-                    title=f"You won **{won}** :potato: \:D", color=0x3498DB
-                )
-                embed.set_footer(text="thats pretty pog ngl")
-                await ctx.send(embed=embed)
-            else:
-                await update_bank(ctx.author, -1 * amount)
-                embed = discord.Embed(
-                    title=f"You lost **{won}** :potato: ;-;", color=0x3498DB
-                )
-                embed.set_footer(text="lol imagine losing in a coin flip")
-                await ctx.send(embed=embed)
+        await update_bank(ctx.author, -1 * gamble_amount)
+        embed = discord.Embed(
+            title=f"You lost **{gamble_amount}** :potato: ;-;", color=0x3498DB
+        )
+        embed.set_footer(text="lol imagine losing in a coin flip")
+        await ctx.send(embed=embed)
 
 
 @bot.command(aliases=["with"])
-async def withdraw(ctx : Context, amount=None):
+async def withdraw(ctx: Context, amount=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1290,7 +1214,7 @@ async def update_bank(user, change=0, mode="wallet") -> list[int]:
 
 
 @bot.command(aliases=["lb", "rich"])
-async def leaderboard(ctx : Context):
+async def leaderboard(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1324,7 +1248,7 @@ async def leaderboard(ctx : Context):
 
 
 @bot.command(aliases=["lbreverse", "richreverse"])
-async def leaderboardreverse(ctx : Context):
+async def leaderboardreverse(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1358,7 +1282,7 @@ async def leaderboardreverse(ctx : Context):
 
 
 @bot.command()
-async def botpic(ctx : Context):
+async def botpic(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1367,7 +1291,7 @@ async def botpic(ctx : Context):
 
 
 @bot.command()
-async def avatar(ctx : Context, *, member: discord.Member = None):
+async def avatar(ctx: Context, *, member: discord.Member = None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1376,10 +1300,10 @@ async def avatar(ctx : Context, *, member: discord.Member = None):
             await ctx.send(str(member.avatar))
         else:
             await ctx.send(str(ctx.author.avatar))
-            
+
 
 @bot.command()
-async def customembed(ctx : Context, color: discord.Colour, title, *, description):
+async def customembed(ctx: Context, color: discord.Colour, title, *, description):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1392,7 +1316,7 @@ async def customembed(ctx : Context, color: discord.Colour, title, *, descriptio
 
 @bot.command(pass_context=True)
 @commands.cooldown(1, 2, commands.BucketType.user)
-async def meme(ctx : Context):
+async def meme(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1411,7 +1335,7 @@ async def meme(ctx : Context):
 
 
 @meme.error
-async def meme_error(ctx : Context, error):
+async def meme_error(ctx: Context, error):
     if isinstance(error, commands.CommandOnCooldown):
         msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 2s)".format(
             error.retry_after
@@ -1440,13 +1364,13 @@ async def on_guild_join(guild):
 @bot.event
 async def on_ready():
     print(f"{bot.user.name} is ready :D")
-    
+
     # Add bot commands (in pcommands)
     await bot.add_cog(HelpCommands())
     await bot.add_cog(StaffCommands(bot))
     await bot.add_cog(DeveloperCommands(bot, launch_time))
     #
-    
+
     servers = len(bot.guilds)
     members = 0
     for guild in bot.guilds:
@@ -1462,20 +1386,20 @@ async def on_ready():
 
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def addrole(ctx : Context, member: discord.Member, role: discord.Role):
+async def addrole(ctx: Context, member: discord.Member, role: discord.Role):
     await ctx.send("Role added")
     await member.add_roles(role)
     await ctx.send("as been unjailed :white_check_mark:")
 
 
 @addrole.error
-async def addrole_error(ctx : Context, error):
+async def addrole_error(ctx: Context, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You cant do that! (u need perms)")
 
 
 @bot.command()
-async def guild(ctx : Context):
+async def guild(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1492,7 +1416,7 @@ async def guild(ctx : Context):
             icon = ctx.guild.icon.url
         except AttributeError:
             pass
-        
+
         link = await ctx.channel.create_invite()
 
         embed = discord.Embed(
@@ -1508,7 +1432,7 @@ async def guild(ctx : Context):
 
 
 @bot.command()
-async def fact(ctx : Context):
+async def fact(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1522,7 +1446,7 @@ async def fact(ctx : Context):
 
 
 @bot.command()
-async def invite(ctx : Context):
+async def invite(ctx: Context):
     embed = discord.Embed(
         title="Click here invite",
         url="https://discord.com/api/oauth2/authorize?client_id=839966871143186472&permissions=1007021303&scope=bot",
@@ -1538,7 +1462,7 @@ async def invite(ctx : Context):
 
 
 @bot.command()
-async def vote(ctx : Context):
+async def vote(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
@@ -1553,7 +1477,7 @@ async def vote(ctx : Context):
 
 
 @bot.command()
-async def about(ctx : Context):
+async def about(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
