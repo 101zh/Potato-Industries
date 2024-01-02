@@ -1,6 +1,4 @@
 import discord
-from discord import client
-import os
 from discord.ext import commands
 from discord.ext.commands import Context
 

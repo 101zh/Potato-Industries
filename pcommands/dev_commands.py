@@ -3,7 +3,6 @@ from discord import Member
 import os
 from discord.ext import commands
 from discord.ext.commands import Context
-import utils.blacklist as botbans
 from datetime import datetime
 
 """
