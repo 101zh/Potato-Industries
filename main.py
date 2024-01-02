@@ -1150,7 +1150,7 @@ async def coinflip(ctx: Context, amount=None):
     else:
         await update_bank(ctx.author, -1 * gamble_amount)
         embed = discord.Embed(
-            title=f"You lost **{gamble_amount}** :potato: ;-;", color=0x3498DB
+            title=f"You lost **{gamble_amount}** :potato: ;-;", color=0xe74c3c
         )
         embed.set_footer(text="lol imagine losing in a coin flip")
         await ctx.send(embed=embed)
