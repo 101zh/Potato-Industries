@@ -1,3 +1,13 @@
+# Replit files
+.replit
+pyproject.toml
+poetry.lock
+.upm/*
+.pythonlibs/*
+replit.nix
+pyproject.toml.backup
+
+
 # Database files
 database/*
 
