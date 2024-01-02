@@ -552,31 +552,33 @@ async def buy(ctx: Context, amount, *, item):
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
     else:
-        try:
-            amount = int(amount)
-            await open_account(ctx.author)
-            res = await buy_this(ctx.author, item, amount)
-            if not res[0]:
-                if res[1] == 1:
-                    await ctx.send("The tool isn't in the shop")
-                    return
-                if res[1] == 2:
-                    if amount == 1:
-                        await ctx.send(
-                            f"You don't have enough potatoes in your pocket to purchase a **{item}** <:XD:806659054721564712>"
-                        )
+        if amount < 0:
+            await ctx.send("hey, are you trying to break me?")
+        else:
+            try:
+                amount = int(amount)
+                await open_account(ctx.author)
+                res = await buy_this(ctx.author, item, amount)
+                if not res[0]:
+                    if res[1] == 1:
+                        await ctx.send("The tool isn't in the shop")
                         return
-                    else:
-                        await ctx.send(
-                            f"You don't have enough potatoes in your pocket to purchase **{amount} {item}s** <:XD:806659054721564712>"
-                        )
-                        return
-            await ctx.send(f"You just bought **{amount} {item}** :0")
-        except:
-            await ctx.send(
-                "try formatting it like this: `p!buy {amount} {item}` \nExample: `p!buy 1 iron hoe`"
-            )
-
+                    if res[1] == 2:
+                        if amount == 1:
+                            await ctx.send(
+                                f"You don't have enough potatoes in your pocket to purchase a **{item}** <:XD:806659054721564712>"
+                            )
+                            return
+                        else:
+                            await ctx.send(
+                                f"You don't have enough potatoes in your pocket to purchase **{amount} {item}s** <:XD:806659054721564712>"
+                            )
+                            return
+                await ctx.send(f"You just bought **{amount} {item}** :0")
+            except:
+                await ctx.send(
+                    "try formatting it like this: `p!buy {amount} {item}` \nExample: `p!buy 1 iron hoe`"
+                )
 
 @bot.command(aliases=["store", "market"])
 async def shop(ctx: Context):
