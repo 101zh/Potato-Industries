@@ -8,6 +8,7 @@ from datetime import datetime
 import datetime as dt  # why the hell is there a breakpoint here
 from keep_alive import keep_alive
 import io
+from pcommands.e_commands import EconomyCommands
 import utils.blacklist as botbans
 import asyncio
 from pcommands.help_commands import HelpCommands
@@ -27,7 +28,6 @@ def get_prefix(client, message):
 
 
 # code setup
-Loop = False
 bot = commands.Bot(
     command_prefix=get_prefix, intents=discord.Intents.all(), case_insensitive=True
 )
@@ -101,28 +101,6 @@ launch_time = datetime.utcnow()
 blacklisted = []
 # for fun yay thunderredstar
 # bruh
-
-
-@bot.command()
-async def use(ctx: Context, amount, *, item=None):
-    if not item:
-        await ctx.send(
-            "try formatting it like this: `p!use {amount} {item}` \nExample: `p!use 1 lottery potato`"
-        )
-        return
-    item = item.lower()
-    if item == "lottery potato":
-        e = random.randint(0, 100)
-        print(e)
-        if e <= 5:
-            await update_bank(ctx.author, 42069)
-        else:
-            await ctx.send("Sorry, you didn't win anything")
-    else:
-        await ctx.send(
-            "please use a valid item or try formatting it like this: `p!use {amount} {item}` \nExample: `p!use 1 lottery potato`"
-        )
-
 
 @bot.event
 async def on_message(message: discord.Message):
@@ -1376,6 +1354,7 @@ async def on_ready():
     await bot.add_cog(HelpCommands())
     await bot.add_cog(StaffCommands(bot))
     await bot.add_cog(DeveloperCommands(bot, launch_time))
+    await bot.add_cog(EconomyCommands())
     #
 
     servers = len(bot.guilds)
