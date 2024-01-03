@@ -4,8 +4,9 @@ from discord.ext.commands import Context
 
 
 class EconomyCommands(commands.Cog):
-    def __init__(self):
+    def __init__(self, bot : commands.Bot):
         self = self
+        self.bot = bot
 
     @commands.command()
     async def use(self, ctx: Context, amount: int, *, item: str = None):
@@ -35,6 +36,66 @@ class EconomyCommands(commands.Cog):
                 "please use a valid item or try formatting it like this: `p!use {amount} {item}` \nExample: `p!use 1 lottery potato`"
             )
 
+    @commands.command(aliases=["gift", "gib", "send", "transfer"])
+    async def give(self, ctx: Context, member: discord.Member, amount=None):
+        if ctx.author.id in self.bot.ids:
+            await ctx.send(
+                "You cant give people potatoes, your in passive <:potato_angry:814539600235986964>"
+            )
+        elif member.id in self.bot.ids:
+            await ctx.send(
+                "Leave that passive potato alone <:potato_angry:814539600235986964>"
+            )
+        else:
+            await self.open_account(ctx.author)
+            await self.open_account(member)
+            if amount == None:
+                await ctx.send(
+                    "You have to enter an amount to deposit <:seriously:809518766470987799>"
+                )
+                return
+            bal = await self.update_bank(ctx.author)
+            if amount == "all":
+                if bal[0] == 0:
+                    await ctx.send(
+                        "ah yes, im sure {member.name} would love 0 potatoes <:noice:809518758262603786>"
+                    )
+                elif bal[0] < 0:
+                    await ctx.send("You can't send someone negative :potato: kek")
+                else:
+                    amount = bal[0]
+            amount = int(amount)
+            if amount > bal[0]:
+                await ctx.send(
+                    f"You're too poor to give {amount} potatoes <:XD:806659054721564712>"
+                )
+                return
+            if amount < 0:
+                await ctx.send(
+                    "How the hecc u think you can give negative potatoes <:pepe_hehe:816898198315597834>"
+                )
+                return
+            if amount == 0:
+                await ctx.send(
+                    f"ah yes, im sure {member.name} would love 0 potatoes <:noice:809518758262603786>"
+                )
+                return
+            await self.update_bank(ctx.author, -1 * amount, "wallet")
+            await self.update_bank(member, amount, "wallet")
+            await ctx.send(f"You gave **{amount}** :potato: to {member.mention}!")
+
+    async def open_account(self, user):
+        users = await self.get_user_data()
+        if str(user.id) in users:
+            return False
+        else:
+            users[str(user.id)] = {}
+            users[str(user.id)]["wallet"] = 0
+            users[str(user.id)]["bank"] = 0
+        with open("database/potato.json", "w") as f:
+            json.dump(users, f)
+        return True
+
     async def update_bank(
         self, user: discord.Member, change=0, mode="wallet"
     ) -> list[int]:
@@ -49,9 +110,9 @@ class EconomyCommands(commands.Cog):
         self, user: discord.Member, item: str, amount_used: int
     ) -> int:
         # Exception amount_used can't be negative
-        if(amount_used<0):
+        if amount_used < 0:
             return -3
-        
+
         item = item.lower()
         users = await self.get_user_data()
         usershed = users[str(user.id)]["shed"]
@@ -105,5 +166,3 @@ class EconomyCommands(commands.Cog):
             await ctx.send(f"You won {amount_won} congratulations!")
         else:
             await ctx.send("Sorry, you didn't win anything")
-            
-            

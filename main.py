@@ -286,7 +286,7 @@ async def sell_this(user, item_name, amount, price=None):
 
     cost = price * amount
 
-    users = await get_bank_data()
+    users = await get_user_data()
 
     bal = await update_bank(user)
 
@@ -432,7 +432,7 @@ async def buy_this(user, item_name, amount):
     if name_ == None:
         return [False, 1]
     cost = price * amount
-    users = await get_bank_data()
+    users = await get_user_data()
     bal = await update_bank(user)
     if bal[0] < cost:
         return [False, 2]
@@ -483,7 +483,7 @@ async def shed(ctx: Context, *, member: discord.Member = None):
         if member:
             await open_account(member)
             user = member
-            users = await get_bank_data()
+            users = await get_user_data()
             try:
                 shed = users[str(user.id)]["shed"]
             except:
@@ -500,7 +500,7 @@ async def shed(ctx: Context, *, member: discord.Member = None):
         else:
             await open_account(ctx.author)
             user = ctx.author
-            users = await get_bank_data()
+            users = await get_user_data()
             try:
                 shed = users[str(user.id)]["shed"]
             except:
@@ -591,7 +591,7 @@ async def balance(ctx: Context, *, mention: discord.Member = None):
         if mention:
             await open_account(mention)
             user = mention
-            users = await get_bank_data()
+            users = await get_user_data()
             wallet_amt = users[str(mention.id)]["wallet"]
             bank_amt = users[str(mention.id)]["bank"]
             if wallet_amt < 0:
@@ -609,7 +609,7 @@ async def balance(ctx: Context, *, mention: discord.Member = None):
         else:
             await open_account(ctx.author)
             user = ctx.author
-            users = await get_bank_data()
+            users = await get_user_data()
             wallet_amt = users[str(user.id)]["wallet"]
             bank_amt = users[str(user.id)]["bank"]
             if wallet_amt < 0:
@@ -645,7 +645,7 @@ async def beg(ctx: Context):
             "Barack Obama",
             "<@710709742791819274>",
         ]
-        users = await get_bank_data()
+        users = await get_user_data()
         user = ctx.author
         earnings = random.randint(1000, 2000)
         person = random.choice(person_list)
@@ -781,7 +781,7 @@ async def rob(ctx: Context, *, member: discord.Member):
                 pass
             await open_account(member)
             await open_account(ctx.author)
-            users = await get_bank_data()
+            users = await get_user_data()
             user = ctx.author
             try:
                 shed = users[str(user.id)]["shed"]
@@ -883,7 +883,7 @@ async def farm(ctx: Context):
         return
     else:
         await open_account(ctx.author)
-        users = await get_bank_data()
+        users = await get_user_data()
         user = ctx.author
         earnings = random.randrange(-50, 50)
         try:
@@ -974,7 +974,7 @@ async def serverlist(ctx: Context):
 @commands.is_owner()
 async def addpotatoes(ctx: Context, member: discord.Member, amount):
     await open_account(member)
-    users = await get_bank_data()
+    users = await get_user_data()
     user = member
     users[str(user.id)]["wallet"] += int(amount)
     with open("database/potato.json", "w") as f:
@@ -1023,59 +1023,6 @@ async def deposit(ctx: Context, amount=None):
         await update_bank(ctx.author, -1 * amount)
         await update_bank(ctx.author, amount, "bank")
         await ctx.send(f"You deposited **{amount}** :potato: :0")
-
-
-@bot.command(aliases=["gift", "gib", "send", "transfer"])
-async def give(ctx: Context, member: discord.Member, amount=None):
-    if ctx.author.id in blacklisted:
-        await ctx.send("you are temporarily blacklisted/banned from PI")
-        return
-    else:
-        if ctx.author.id in bot.ids:
-            await ctx.send(
-                "You cant give people potatoes, your in passive <:potato_angry:814539600235986964>"
-            )
-        elif member.id in bot.ids:
-            await ctx.send(
-                "Leave that passive potato alone <:potato_angry:814539600235986964>"
-            )
-        else:
-            await open_account(ctx.author)
-            await open_account(member)
-            if amount == None:
-                await ctx.send(
-                    "You have to enter an amount to deposit <:seriously:809518766470987799>"
-                )
-                return
-            bal = await update_bank(ctx.author)
-            if amount == "all":
-                if bal[0] == 0:
-                    await ctx.send(
-                        "ah yes, im sure {member.name} would love 0 potatoes <:noice:809518758262603786>"
-                    )
-                elif bal[0] < 0:
-                    await ctx.send("You can't send someone negative :potato: kek")
-                else:
-                    amount = bal[0]
-            amount = int(amount)
-            if amount > bal[0]:
-                await ctx.send(
-                    f"You're too poor to give {amount} potatoes <:XD:806659054721564712>"
-                )
-                return
-            if amount < 0:
-                await ctx.send(
-                    "How the hecc u think you can give negative potatoes <:pepe_hehe:816898198315597834>"
-                )
-                return
-            if amount == 0:
-                await ctx.send(
-                    f"ah yes, im sure {member.name} would love 0 potatoes <:noice:809518758262603786>"
-                )
-                return
-            await update_bank(ctx.author, -1 * amount, "wallet")
-            await update_bank(member, amount, "wallet")
-            await ctx.send(f"You gave **{amount}** :potato: to {member.mention}!")
 
 
 @bot.command(aliases=["gamble"])
@@ -1171,7 +1118,7 @@ async def withdraw(ctx: Context, amount=None):
 
 
 async def open_account(user):
-    users = await get_bank_data()
+    users = await get_user_data()
     if str(user.id) in users:
         return False
     else:
@@ -1183,14 +1130,14 @@ async def open_account(user):
     return True
 
 
-async def get_bank_data() -> dict:
+async def get_user_data() -> dict:
     with open("database/potato.json", "r") as f:
         users = json.load(f)
     return users
 
 
 async def update_bank(user, change=0, mode="wallet") -> list[int]:
-    users = await get_bank_data()
+    users = await get_user_data()
     users[str(user.id)][mode] += change
     with open("database/potato.json", "w") as f:
         json.dump(users, f)
@@ -1205,7 +1152,7 @@ async def leaderboard(ctx: Context):
         return
     else:
         x = 10
-        users = await get_bank_data()
+        users = await get_user_data()
         leader_board = {}
         total = []
         for user in users:
@@ -1239,7 +1186,7 @@ async def leaderboardreverse(ctx: Context):
         return
     else:
         x = 10
-        users = await get_bank_data()
+        users = await get_user_data()
         leader_board = {}
         total = []
         for user in users:
@@ -1354,7 +1301,7 @@ async def on_ready():
     await bot.add_cog(HelpCommands())
     await bot.add_cog(StaffCommands(bot))
     await bot.add_cog(DeveloperCommands(bot, launch_time))
-    await bot.add_cog(EconomyCommands())
+    await bot.add_cog(EconomyCommands(bot))
     #
 
     servers = len(bot.guilds)
