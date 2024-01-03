@@ -9,7 +9,7 @@ import datetime as dt  # why the hell is there a breakpoint here
 from keep_alive import keep_alive
 import io
 from pcommands.e_commands import EconomyCommands
-import utils.blacklist as botbans
+from utils.blacklist import BlacklistCommands as botbans
 import asyncio
 from pcommands.help_commands import HelpCommands
 from pcommands.dev_commands import StaffCommands, DeveloperCommands
