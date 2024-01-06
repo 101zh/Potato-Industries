@@ -463,8 +463,15 @@ async def get_user_data():
         users = json.load(f)
     return users
 
-async def get_shop_items():
-    with open("database/shopitems.json", "r") as f:
+async def get_shop_item(item_name : str) -> dict | None:
+    shop_items = await get_shop_items()
+    try:
+        return shop_items[item_name]
+    except KeyError:
+        return None
+    
+async def get_shop_items() -> dict:
+    with open("assets/shopitems.json", "r") as f:
         shop_items = json.load(f)
     return shop_items
 
@@ -475,15 +482,11 @@ async def update_bank(user, amount=0, db="wallet"):
         json.dump(users, f)
     return users[str(user.id)][db]
 
-async def buy_this(user, item_name, amount):
+async def buy_this(user, item_name : str, amount : int):
     item_name = item_name.lower()
-    shop_items = await get_shop_items()
-    item_data = None
-    for item in shop_items:
-        if item["name"].lower() == item_name:
-            item_data = item
-            break
-    if item_data is None:
+    item_data = await get_shop_item(item_name)
+    
+    if item_data == None:
         return [False, 1]
     cost = item_data["price"] * amount
     users = await get_user_data()
