@@ -4,33 +4,37 @@ from discord.ext.commands import Context
 
 
 class EconomyCommands(commands.Cog):
-    def __init__(self, bot : commands.Bot):
+    def __init__(self, bot: commands.Bot):
         self = self
         self.bot = bot
 
     @commands.command()
-    async def use(self, ctx: Context, amount: int, *, item: str = None):
+    async def use(self, ctx: Context, amount_used: int, *, item: str = None):
         if not item:
             await ctx.send(
                 "try formatting it like this: `p!use {amount} {item}` \nExample: `p!use 1 lottery potato`"
             )
             return
+        elif amount_used < 0:
+            await ctx.send("You can't use a negative amount")
+            return
+        elif amount_used == 0:
+            await ctx.send("What are you trying to do here?")
+            return
+
         item = item.lower()
 
-        # Uses the item; returns a negative # if the isn't found/more is used than one has
-        error = await self.update_user_shed(ctx.author, item, amount)
+        # Uses the item; returns a negative # if the item isn't found
+        error = await self.update_user_shed(ctx.author, item, amount_used)
         if error == -1:
             await ctx.send("You don't have that item")
             return
         elif error == -2:
             await ctx.send("You can't use more than you have")
             return
-        elif error == -3:
-            await ctx.send("What are you trying to do here?")
-            return
 
         if item == "lottery potato":
-            await self.use_lottery_potato(ctx=ctx, amount=amount)
+            await self.use_lottery_potato(ctx=ctx, amount=amount_used)
         else:
             await ctx.send(
                 "please use a valid item or try formatting it like this: `p!use {amount} {item}` \nExample: `p!use 1 lottery potato`"
@@ -109,10 +113,6 @@ class EconomyCommands(commands.Cog):
     async def update_user_shed(
         self, user: discord.Member, item: str, amount_used: int
     ) -> int:
-        # Exception amount_used can't be negative
-        if amount_used < 0:
-            return -3
-
         item = item.lower()
         users = await self.get_user_data()
         usershed = users[str(user.id)]["shed"]
@@ -126,16 +126,18 @@ class EconomyCommands(commands.Cog):
         # Checking if the item is found
         if index != -1:
             updated_amount = usershed[index]["amount"] - amount_used
+            
+            # Checking that the new amount isn't negative
             if updated_amount < 0:
-                # returns -2 if the amount used is more than acceptable
                 return -2
-            elif updated_amount == 0:
+            
+            # Actually using the item
+            if updated_amount == 0:
                 del usershed[index]
-            else:
-                usershed[index]["amount"] -= amount_used
+            else:            
+                usershed[index]["amount"] = updated_amount
 
             users[str(user.id)]["shed"] = usershed
-
             with open("database/potato.json", "w") as f:
                 json.dump(users, f)
 
@@ -143,8 +145,7 @@ class EconomyCommands(commands.Cog):
         else:
             return -1
 
-        # -3 is for when amount is a negative value
-        # -2 is for negative amount value
+        # -2 if amount_used makes amount < 0
         # -1 is for not found
         # any other # means that it's successful
 
