@@ -40,76 +40,6 @@ class EconomyCommands(commands.Cog):
                 "please use a valid item or try formatting it like this: `p!use {amount} {item}` \nExample: `p!use 1 lottery potato`"
             )
 
-    @commands.command(aliases=["gift", "gib", "send", "transfer"])
-    async def give(self, ctx: Context, member: discord.Member, amount=None):
-        if ctx.author.id in self.bot.ids:
-            await ctx.send(
-                "You cant give people potatoes, your in passive <:potato_angry:814539600235986964>"
-            )
-        elif member.id in self.bot.ids:
-            await ctx.send(
-                "Leave that passive potato alone <:potato_angry:814539600235986964>"
-            )
-        else:
-            await self.open_account(ctx.author)
-            await self.open_account(member)
-            if amount == None:
-                await ctx.send(
-                    "You have to enter an amount to deposit <:seriously:809518766470987799>"
-                )
-                return
-            bal = await self.update_bank(ctx.author)
-            if amount == "all":
-                if bal[0] == 0:
-                    await ctx.send(
-                        "ah yes, im sure {member.name} would love 0 potatoes <:noice:809518758262603786>"
-                    )
-                elif bal[0] < 0:
-                    await ctx.send("You can't send someone negative :potato: kek")
-                else:
-                    amount = bal[0]
-            amount = int(amount)
-            if amount > bal[0]:
-                await ctx.send(
-                    f"You're too poor to give {amount} potatoes <:XD:806659054721564712>"
-                )
-                return
-            if amount < 0:
-                await ctx.send(
-                    "How the hecc u think you can give negative potatoes <:pepe_hehe:816898198315597834>"
-                )
-                return
-            if amount == 0:
-                await ctx.send(
-                    f"ah yes, im sure {member.name} would love 0 potatoes <:noice:809518758262603786>"
-                )
-                return
-            await self.update_bank(ctx.author, -1 * amount, "wallet")
-            await self.update_bank(member, amount, "wallet")
-            await ctx.send(f"You gave **{amount}** :potato: to {member.mention}!")
-
-    async def open_account(self, user):
-        users = await self.get_user_data()
-        if str(user.id) in users:
-            return False
-        else:
-            users[str(user.id)] = {}
-            users[str(user.id)]["wallet"] = 0
-            users[str(user.id)]["bank"] = 0
-        with open("database/potato.json", "w") as f:
-            json.dump(users, f)
-        return True
-
-    async def update_bank(
-        self, user: discord.Member, change=0, mode="wallet"
-    ) -> list[int]:
-        users = await self.get_user_data()
-        users[str(user.id)][mode] += change
-        with open("database/potato.json", "w") as f:
-            json.dump(users, f)
-        bal = [users[str(user.id)]["wallet"], users[str(user.id)]["bank"]]
-        return bal
-
     async def update_user_shed(
         self, user: discord.Member, item: str, amount_used: int
     ) -> int:
@@ -148,11 +78,6 @@ class EconomyCommands(commands.Cog):
         # -2 if amount_used makes amount < 0
         # -1 is for not found
         # any other # means that it's successful
-
-    async def get_user_data(self) -> dict:
-        with open("database/potato.json", "r") as f:
-            users = json.load(f)
-        return users
 
     async def use_lottery_potato(self, ctx: Context, amount: int) -> None:
         times_won = 0
@@ -244,98 +169,6 @@ class EconomyCommands(commands.Cog):
         else:
             raise error
 
-    async def sell_this(self, user, item_name, amount, price=None):
-        item_name = item_name.lower()
-        name_ = None
-        for item in mainshop:
-            name = item["name"].lower()
-            if name == item_name:
-                name_ = name
-                if price == None:
-                    price = 0.9 * item["price"]
-                break
-
-        if name_ == None:
-            return [False, 1]
-
-        cost = price * amount
-
-        users = await self.get_user_data()
-
-        bal = await self.update_bank(user)
-
-        try:
-            index = 0
-            t = None
-            for thing in users[str(user.id)]["shed"]:
-                n = thing["item"]
-                if n == item_name:
-                    old_amt = thing["amount"]
-                    new_amt = old_amt - amount
-                    if new_amt < 0:
-                        return [False, 2]
-                    users[str(user.id)]["shed"][index]["amount"] = new_amt
-                    t = 1
-                    break
-                index += 1
-            if t == None:
-                return [False, 3]
-        except:
-            return [False, 3]
-
-        with open("database/potato.json", "w") as f:
-            json.dump(users, f)
-
-        await self.update_bank(user, abs(cost), "wallet")
-
-        return [True, "Worked"]
-
-    async def get_shop_item(self, item_name: str) -> dict | None:
-        shop_items = await self.get_shop_items()
-        try:
-            return shop_items[item_name]
-        except KeyError:
-            return None
-
-    async def get_shop_items(self) -> dict:
-        with open("assets/shopitems.json", "r") as f:
-            shop_items = json.load(f)
-        return shop_items
-
-    async def buy_this(self, user, item_name: str, amount: int):
-        item_name = item_name.lower()
-        item_data = await self.get_shop_item(item_name)
-
-        if item_data == None:
-            return [False, 1]
-        cost = item_data["price"] * amount
-        users = await self.get_user_data()
-        bal = await self.update_bank(user)
-        if bal[0] < cost:
-            return [False, 2]
-        try:
-            index = 0
-            t = None
-            for thing in users[str(user.id)]["shed"]:
-                n = thing["item"]
-                if n == item_name:
-                    old_amt = thing["amount"]
-                    new_amt = old_amt + amount
-                    users[str(user.id)]["shed"][index]["amount"] = new_amt
-                    t = 1
-                    break
-                index += 1
-            if t == None:
-                obj = {"item": item_name, "amount": amount}
-                users[str(user.id)]["shed"].append(obj)
-        except:
-            obj = {"item": item_name, "amount": amount}
-            users[str(user.id)]["shed"] = [obj]
-        with open("database/potato.json", "w") as f:
-            json.dump(users, f)
-        await self.update_bank(user, cost * -1, "wallet")
-        return [True, "Worked"]
-
     @commands.command(aliases=["tools", "inventory", "inv", "shack"])
     async def shed(self, ctx: Context, *, member: discord.Member = None):
         if member:
@@ -422,6 +255,54 @@ class EconomyCommands(commands.Cog):
                 )
         await ctx.send(embed=em)
 
+    @commands.command(aliases=["gift", "gib", "send", "transfer"])
+    async def give(self, ctx: Context, member: discord.Member, amount=None):
+        if ctx.author.id in self.bot.ids:
+            await ctx.send(
+                "You cant give people potatoes, your in passive <:potato_angry:814539600235986964>"
+            )
+        elif member.id in self.bot.ids:
+            await ctx.send(
+                "Leave that passive potato alone <:potato_angry:814539600235986964>"
+            )
+        else:
+            await self.open_account(ctx.author)
+            await self.open_account(member)
+            if amount == None:
+                await ctx.send(
+                    "You have to enter an amount to deposit <:seriously:809518766470987799>"
+                )
+                return
+            bal = await self.update_bank(ctx.author)
+            if amount == "all":
+                if bal[0] == 0:
+                    await ctx.send(
+                        "ah yes, im sure {member.name} would love 0 potatoes <:noice:809518758262603786>"
+                    )
+                elif bal[0] < 0:
+                    await ctx.send("You can't send someone negative :potato: kek")
+                else:
+                    amount = bal[0]
+            amount = int(amount)
+            if amount > bal[0]:
+                await ctx.send(
+                    f"You're too poor to give {amount} potatoes <:XD:806659054721564712>"
+                )
+                return
+            if amount < 0:
+                await ctx.send(
+                    "How the hecc u think you can give negative potatoes <:pepe_hehe:816898198315597834>"
+                )
+                return
+            if amount == 0:
+                await ctx.send(
+                    f"ah yes, im sure {member.name} would love 0 potatoes <:noice:809518758262603786>"
+                )
+                return
+            await self.update_bank(ctx.author, -1 * amount, "wallet")
+            await self.update_bank(member, amount, "wallet")
+            await ctx.send(f"You gave **{amount}** :potato: to {member.mention}!")
+
     @commands.command(aliases=["bal", "potats", "potatoes", "vault"])
     async def balance(self, ctx: Context, *, mention: discord.Member = None):
         if mention:
@@ -446,8 +327,8 @@ class EconomyCommands(commands.Cog):
             await self.open_account(ctx.author)
             user = ctx.author
             users = await self.get_user_data()
-            wallet_amt = users[str(user.id)]["wallet"]
-            bank_amt = users[str(user.id)]["bank"]
+            wallet_amt = users[str(user.id)]["balance"]["wallet"]
+            bank_amt = users[str(user.id)]["balance"]["bank"]
             if wallet_amt < 0:
                 await self.update_bank(ctx.author, -1 * wallet_amt)
             else:
@@ -488,7 +369,7 @@ class EconomyCommands(commands.Cog):
         ]
         embed = discord.Embed(description=random.choice(beg_list), color=0x2ECC71)
         await ctx.send(embed=embed)
-        users[str(user.id)]["wallet"] += earnings
+        users[str(user.id)]["balance"]["wallet"] += earnings
         with open("database/potato.json", "w") as f:
             json.dump(users, f)
 
@@ -565,7 +446,7 @@ class EconomyCommands(commands.Cog):
                 description="wow i cant believe youve actually farmed **0 :potato:** ill give u **696969 :potato:** cuz i feel kinda bad..."
             )
             earnings = 696969
-        users[str(user.id)]["wallet"] += earnings
+        users[str(user.id)]["balance"]["wallet"] += earnings
         with open("database/potato.json", "w") as f:
             json.dump(users, f)
         await ctx.send(embed=embed)
@@ -586,7 +467,7 @@ class EconomyCommands(commands.Cog):
         await self.open_account(member)
         users = await self.get_user_data()
         user = member
-        users[str(user.id)]["wallet"] += int(amount)
+        users[str(user.id)]["balance"]["wallet"] += int(amount)
         with open("database/potato.json", "w") as f:
             json.dump(users, f)
         await ctx.send(f"Added **{amount}** :potato: to {member.mention}")
@@ -905,7 +786,6 @@ class EconomyCommands(commands.Cog):
             print(error)
             self.rob.reset_cooldown(ctx)
 
-
     @commands.command(aliases=["lb", "rich"])
     async def leaderboard(self, ctx: Context):
         x = 10
@@ -963,3 +843,142 @@ class EconomyCommands(commands.Cog):
             else:
                 index += 1
         await ctx.send(embed=em)
+
+    ### Helper Methods Relating to Money
+    async def get_user_data(self) -> dict:
+        with open("database/potato.json", "r") as f:
+            users = json.load(f)
+        return users
+
+    async def get_bank_data(self, user: discord.Member):
+        users = await self.get_user_data()
+        return users[str(user.id)]["balance"]
+
+    async def open_account(self, user: discord.Member) -> bool:
+        users = await self.get_user_data()
+        if str(user.id) in users:
+            return False
+        else:
+            users[str(user.id)] = {}
+            users[str(user.id)]["balance"] = {}
+            users[str(user.id)]["balance"]["wallet"] = 0
+            users[str(user.id)]["balance"]["bank"] = 0
+        with open("database/potato.json", "w") as f:
+            json.dump(users, f)
+        return True
+
+    async def update_bank(
+        self, user: discord.Member, change=0, mode="wallet"
+    ) -> list[int]:
+        users = await self.get_user_data()
+        users[str(user.id)]["balance"][mode] += change
+        with open("database/potato.json", "w") as f:
+            json.dump(users, f)
+        bal = [
+            users[str(user.id)]["balance"]["wallet"],
+            users[str(user.id)]["balance"]["bank"],
+        ]
+        return bal
+
+    async def set_balance(self, user: discord.Member, wallet: int, bank: int):
+        users = await self.get_user_data()
+        users[str(user.id)]["balance"]["wallet"] = wallet
+        users[str(user.id)]["balance"]["bank"] = bank
+        with open("database/potato.json", "w") as f:
+            json.dump(users, f)
+
+    ### Helper Methods Relating to item data & Inventories
+
+
+    async def sell_this(self, user, item_name, amount, price=None):
+        item_name = item_name.lower()
+        name_ = None
+        for item in mainshop:
+            name = item["name"].lower()
+            if name == item_name:
+                name_ = name
+                if price == None:
+                    price = 0.9 * item["price"]
+                break
+
+        if name_ == None:
+            return [False, 1]
+
+        cost = price * amount
+
+        users = await self.get_user_data()
+
+        bal = await self.update_bank(user)
+
+        try:
+            index = 0
+            t = None
+            for thing in users[str(user.id)]["shed"]:
+                n = thing["item"]
+                if n == item_name:
+                    old_amt = thing["amount"]
+                    new_amt = old_amt - amount
+                    if new_amt < 0:
+                        return [False, 2]
+                    users[str(user.id)]["shed"][index]["amount"] = new_amt
+                    t = 1
+                    break
+                index += 1
+            if t == None:
+                return [False, 3]
+        except:
+            return [False, 3]
+
+        with open("database/potato.json", "w") as f:
+            json.dump(users, f)
+
+        await self.update_bank(user, abs(cost), "wallet")
+
+        return [True, "Worked"]
+
+    async def get_shop_item(self, item_name: str) -> dict | None:
+        shop_items = await self.get_shop_items()
+        try:
+            return shop_items[item_name]
+        except KeyError:
+            return None
+
+    async def get_shop_items(self) -> dict:
+        with open("assets/shopitems.json", "r") as f:
+            shop_items = json.load(f)
+        return shop_items
+
+    async def buy_this(self, user, item_name: str, amount: int):
+        item_name = item_name.lower()
+        item_data = await self.get_shop_item(item_name)
+
+        if item_data == None:
+            return [False, 1]
+        cost = item_data["price"] * amount
+        users = await self.get_user_data()
+        bal = await self.update_bank(user)
+        if bal[0] < cost:
+            return [False, 2]
+        try:
+            index = 0
+            t = None
+            for thing in users[str(user.id)]["shed"]:
+                n = thing["item"]
+                if n == item_name:
+                    old_amt = thing["amount"]
+                    new_amt = old_amt + amount
+                    users[str(user.id)]["shed"][index]["amount"] = new_amt
+                    t = 1
+                    break
+                index += 1
+            if t == None:
+                obj = {"item": item_name, "amount": amount}
+                users[str(user.id)]["shed"].append(obj)
+        except:
+            obj = {"item": item_name, "amount": amount}
+            users[str(user.id)]["shed"] = [obj]
+        with open("database/potato.json", "w") as f:
+            json.dump(users, f)
+        await self.update_bank(user, cost * -1, "wallet")
+        return [True, "Worked"]
+
