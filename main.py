@@ -6,6 +6,8 @@ from discord.ext import *
 from datetime import *
 from datetime import datetime
 import datetime as dt  # why the hell is there a breakpoint here
+import discord.ext
+import discord.ext.tasks
 from keep_alive import keep_alive
 import io
 from pcommands.e_commands import EconomyCommands
@@ -26,6 +28,7 @@ def get_prefix(client, message):
     except:
         return "p!"
 
+usersData = {}
 
 # code setup
 bot = commands.Bot(
@@ -39,6 +42,69 @@ redditlist = [
     "https://www.reddit.com/r/meme/new.json",
 ]
 
+# startup and status
+@bot.event
+async def on_ready():
+    print(f"{bot.user.name} is ready :D")
+    if not await databaseFilesExists():
+        await createDatabase()
+        
+    await fetch_all_user_data()
+
+    # Add bot commands (in pcommands)
+    await bot.add_cog(HelpCommands())
+    await bot.add_cog(StaffCommands(bot))
+    await bot.add_cog(DeveloperCommands(bot, launch_time))
+    await bot.add_cog(EconomyCommands(bot, usersData))
+    #
+    
+    if not backupData.is_running():
+        backupData.start()
+
+    servers = len(bot.guilds)
+    members = 0
+    for guild in bot.guilds:
+        members += guild.member_count - 1
+    await bot.change_presence(
+        status=discord.Status.dnd,
+        activity=discord.Activity(
+            type=discord.ActivityType.watching,
+            name=f"{members} users | {servers} servers | p!help",
+        ),
+    )
+    
+@discord.ext.tasks.loop(minutes=10)
+async def backupData():
+    with open("database/userdata.json", "w") as f:
+            json.dump(usersData, f)
+            
+async def fetch_all_user_data():
+        with open("database/userdata.json", "r") as f:
+            usersData = json.load(f)
+    
+async def createDatabase():
+    if not os.path.exists("database"):
+        os.mkdir("database")
+        
+    if not os.path.isfile("database/userdata.json"):
+        with open("database/userdata.json", "w") as file:
+            file.write("{}")
+    if not os.path.isfile("database/prefixes.json"):
+        with open("database/prefixes.json", "w") as file:
+            file.write("{}")
+    if not os.path.isfile("database/channels.json"):
+        with open("database/channels.json", "w") as file:
+            file.write("[]")
+        
+    print("Created Database")
+    
+async def databaseFilesExists() -> bool:
+    return os.path.exists("database") and os.path.isfile("database/userdata.json") and os.path.isfile("database/prefixes.json") and os.path.isfile("database/channels.json")
+
+@bot.command(aliases=["rd", "raw"])
+async def rawdata(ctx : Context):
+    await ctx.send(f"```{usersData}```")
+    
 
 """
 mainshop = [
@@ -458,29 +524,6 @@ async def on_guild_join(guild):
         break
 
 
-# startup and status
-@bot.event
-async def on_ready():
-    print(f"{bot.user.name} is ready :D")
-
-    # Add bot commands (in pcommands)
-    await bot.add_cog(HelpCommands())
-    await bot.add_cog(StaffCommands(bot))
-    await bot.add_cog(DeveloperCommands(bot, launch_time))
-    await bot.add_cog(EconomyCommands(bot))
-    #
-
-    servers = len(bot.guilds)
-    members = 0
-    for guild in bot.guilds:
-        members += guild.member_count - 1
-    await bot.change_presence(
-        status=discord.Status.dnd,
-        activity=discord.Activity(
-            type=discord.ActivityType.watching,
-            name=f"{members} users | {servers} servers | p!help",
-        ),
-    )
 
 
 @bot.command()
