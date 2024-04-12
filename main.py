@@ -4,7 +4,7 @@ from discord.ext import commands
 from discord import Guild, Client
 from discord.ext import *
 from datetime import *
-from datetime import datetime
+from datetime import datetime, timezone
 import datetime as dt  # why the hell is there a breakpoint here
 import discord.ext
 import discord.ext.tasks
@@ -160,7 +160,7 @@ mainshop = [
     },
 ]"""
 
-launch_time = datetime.utcnow()
+launch_time = datetime.now(timezone.utc)
 
 
 blacklisted = []

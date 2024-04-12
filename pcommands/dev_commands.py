@@ -3,7 +3,7 @@ from discord import Member
 import os
 from discord.ext import commands
 from discord.ext.commands import Context
-from datetime import datetime
+from datetime import datetime, timezone
 
 """
 Untested
@@ -302,7 +302,7 @@ class DeveloperCommands(commands.Cog):
 
     @commands.command()
     async def uptime(self, ctx: Context):
-        delta_uptime = datetime.utcnow() - self.launch_time
+        delta_uptime = datetime.now(timezone.utc) - self.launch_time
         hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
         minutes, seconds = divmod(remainder, 60)
         days, hours = divmod(hours, 24)
