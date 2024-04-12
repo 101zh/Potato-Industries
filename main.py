@@ -15,6 +15,7 @@ from utils.blacklist import BlacklistCommands as botbans
 import asyncio
 from pcommands.help_commands import HelpCommands
 from pcommands.dev_commands import StaffCommands, DeveloperCommands
+from typing import Union
 
 # feel free to change the name of the import whenever you want
 # :0 ty
@@ -28,7 +29,8 @@ def get_prefix(client, message):
     except:
         return "p!"
 
-usersData = {}
+
+usersData = dict[str, dict[str, dict[str, Union[dict, int, str]]]]({})
 
 # code setup
 bot = commands.Bot(
@@ -42,13 +44,14 @@ redditlist = [
     "https://www.reddit.com/r/meme/new.json",
 ]
 
+
 # startup and status
 @bot.event
 async def on_ready():
     print(f"{bot.user.name} is ready :D")
     if not await databaseFilesExists():
         await createDatabase()
-        
+
     await fetch_all_user_data()
 
     # Add bot commands (in pcommands)
@@ -57,7 +60,7 @@ async def on_ready():
     await bot.add_cog(DeveloperCommands(bot, launch_time))
     await bot.add_cog(EconomyCommands(bot, usersData))
     #
-    
+
     if not backupData.is_running():
         backupData.start()
 
@@ -72,20 +75,37 @@ async def on_ready():
             name=f"{members} users | {servers} servers | p!help",
         ),
     )
-    
+
+
 @discord.ext.tasks.loop(minutes=10)
 async def backupData():
     with open("database/userdata.json", "w") as f:
-            json.dump(usersData, f)
-            
+        json.dump(usersData, f)
+
+
 async def fetch_all_user_data():
+        global usersData
         with open("database/userdata.json", "r") as f:
             usersData = json.load(f)
-    
+
+
+@bot.command(aliases=["back"])  # REMOVE THIS ON LAUNCH
+async def backup(ctx: Context):
+    with open("database/userdata.json", "w") as f:
+        json.dump(usersData, f)
+
+
+@bot.command()  # REMOVE THIS ON LAUNCH
+async def fetch(ctx: Context):
+    global usersData
+    with open("database/userdata.json", "r") as f:
+        usersData = json.load(f)
+
+
 async def createDatabase():
     if not os.path.exists("database"):
         os.mkdir("database")
-        
+
     if not os.path.isfile("database/userdata.json"):
         with open("database/userdata.json", "w") as file:
             file.write("{}")
@@ -95,16 +115,23 @@ async def createDatabase():
     if not os.path.isfile("database/channels.json"):
         with open("database/channels.json", "w") as file:
             file.write("[]")
-        
+
     print("Created Database")
-    
+
+
 async def databaseFilesExists() -> bool:
-    return os.path.exists("database") and os.path.isfile("database/userdata.json") and os.path.isfile("database/prefixes.json") and os.path.isfile("database/channels.json")
+    return (
+        os.path.exists("database")
+        and os.path.isfile("database/userdata.json")
+        and os.path.isfile("database/prefixes.json")
+        and os.path.isfile("database/channels.json")
+    )
+
 
 @bot.command(aliases=["rd", "raw"])
-async def rawdata(ctx : Context):
+async def rawdata(ctx: Context):
     await ctx.send(f"```{usersData}```")
-    
+
 
 """
 mainshop = [
@@ -166,6 +193,7 @@ launch_time = datetime.now(timezone.utc)
 blacklisted = []
 # for fun yay thunderredstar
 # bruh
+
 
 @bot.event
 async def on_message(message: discord.Message):
@@ -394,7 +422,8 @@ async def passive_error(ctx: Context, error):
     return [True, "Worked"] 
 """
 
-#mogus
+# mogus
+
 
 @bot.command()
 async def sudo(ctx: Context, member: discord.Member, *, message=None):
@@ -522,8 +551,6 @@ async def on_guild_join(guild):
                 "<a:tysm:805858522578812930> Thanks for inviting me to your server! Say `p!help` for help! <:shibalove:805858519958028349>"
             )
         break
-
-
 
 
 @bot.command()
