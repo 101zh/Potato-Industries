@@ -2,6 +2,7 @@ import discord, json, random
 from discord.ext import commands
 from discord.ext.commands import Context
 from userDataWrapper import UsersData
+from typing import Union
 
 import discord.ext
 import discord.ext.tasks
@@ -23,7 +24,7 @@ class EconomyCommands(commands.Cog):
             del dJson
 
         with open("assets/shopitems.json", "r") as sJson:
-            self.shopItems = json.load(sJson)
+            self.shopItems = dict[str, dict[str, Union[str, int]]](json.load(sJson))
 
         self.hoes = ["diamond hoe", "iron hoe", "stone hoe"]
 
@@ -175,12 +176,16 @@ class EconomyCommands(commands.Cog):
                     print("stone")
                 break
         del hoeName
-        
+
         descrip = ""
         if earnings < 0:
-            descrip = random.choice(self.farmDialogueNegative).replace("earnings.money", str(earnings))
+            descrip = random.choice(self.farmDialogueNegative).replace(
+                "earnings.money", str(earnings)
+            )
         elif earnings > 0:
-            descrip = random.choice(self.farmDialoguePositive).replace("earnings.money", str(earnings))
+            descrip = random.choice(self.farmDialoguePositive).replace(
+                "earnings.money", str(earnings)
+            )
         else:
             descrip = "wow i cant believe youve actually farmed **0 :potato:** ill give u **69 :potato:** cuz i feel kinda bad..."
             earnings = 69
@@ -239,7 +244,25 @@ class EconomyCommands(commands.Cog):
 
     @commands.command(aliases=["store", "market"])
     async def shop(self, ctx: Context):
-        pass
+        em = discord.Embed(color=0x2ECC71)
+        for k, v in self.shopItems.items():
+            name = "**" + str(v["name"]) + "**"
+            id = k
+            price = v["cost"]
+            desc = v["description"]
+            if name == "**Test Item**":
+                pass
+            else:
+                em.add_field(
+                    name=name,
+                    value=f"\t id `{id}`\n\tPrice: **{price}**\n\t {desc}",
+                    inline=False,
+                )
+                em.set_author(
+                    name="Potato Industry Tools Shack",
+                    icon_url="https://cdn.discordapp.com/avatars/839966871143186472/1a802ca9786c5bf56cde2ca3ed14dce6.webp?size=1024",
+                )
+        await ctx.send(embed=em)
 
     @commands.command(aliases=["gift", "gib", "send", "transfer"])
     async def give(self, ctx: Context, member: discord.Member, amount=None):
