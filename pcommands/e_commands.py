@@ -12,35 +12,19 @@ class EconomyCommands(commands.Cog):
         self.bot = bot
         self.usersData = usersData
 
-        self.begList = [
-            f"author.mention recived **earnings.money** :potato: from **nosrep** :0",
-            f"author.mention found **earnings.money** :potato: while searching through a dumpster",
-            f"**earnings.money** :potato: fell from the sky and landed in author.mention's arms",
-            f"author.mention summoned **earnings.money** :potato:",
-        ]
-        self.farmListPositive = [
-            f"You farmed potatoes and collected **earnings.money** :potato: :0",
-            f"When farming for potatoes, a depressed potato drops **earnings.money** :potato: which you pick up",
-            f"Some of your potatoes decided to get married and gives birth to **earnings.money** :potato: baby potatoes <:quackity_shy:838192314114506762>",
-            f"Dank Memer gives you **earnings.money** :potato: (cursed??)",
-        ]
-        self.farmListNegative = [
-            f"You farmed potatoes and collected **earnings.money** :potato: :0",
-            f"When farming for potatoes, a depressed potato drops **earnings.money** :potato: which you pick up",
-            f"Some of your potatoes decided to get married and gives birth to **earnings.money** :potato: baby potatoes <:quackity_shy:838192314114506762>",
-            f"Dank Memer gives you **earnings.money** :potato: (cursed??)",
-        ]
-        self.personList = [
-            "Donald Trump",
-            "Elon Musk",
-            "that one weird dude in your class",
-            "Dank Memer",
-            "<@698218089010954481>",
-            "Eren Jeager",
-            "the kid who thinks its 2018",
-            "Barack Obama",
-            "<@710709742791819274>",
-        ]
+        with open("assets/dialogue.json", "r") as dJson:
+            dialogue = json.load(dJson)
+            self.begList = list[str](dialogue["begList"])
+            self.farmDialoguePositive = list[str](dialogue["farmListPositive"])
+            self.farmDialogueNegative = list[str](dialogue["farmListNegative"])
+            self.personList = list[str](dialogue["personList"])
+            del dialogue
+            del dJson
+
+        with open("assets/shopitems.json", "r") as sJson:
+            self.shopItems = json.load(sJson)
+
+        self.hoes = ["diamond hoe", "iron hoe", "stone hoe"]
 
     @commands.command()
     async def use(self, ctx: Context, amount_used: int, *, item: str = None):
@@ -216,11 +200,49 @@ class EconomyCommands(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 1, commands.BucketType.user)
     async def farm(self, ctx: Context):
-        pass
+        await self.create_account(ctx.author)
+        userDat = await self.getUserData(ctx.author)
+        earnings = random.randrange(-50, 50)
+
+        for hoeName in self.hoes:
+            if hoeName in userDat["inv"].keys():
+                print(hoeName)
+                print(userDat)
+                if hoeName == "diamond hoe":
+                    earnings = random.randrange(-25, 100)
+                    print("dia")
+                elif hoeName == "iron hoe":
+                    earnings = random.randrange(-25, 75)
+                    print("iron")
+                elif hoeName == "stone hoe":
+                    earnings = random.randrange(-50, 75)
+                    print("stone")
+                break
+        del hoeName
+        
+        descrip = ""
+        if earnings < 0:
+            descrip = random.choice(self.farmDialogueNegative).replace("earnings.money", str(earnings))
+        elif earnings > 0:
+            descrip = random.choice(self.farmDialoguePositive).replace("earnings.money", str(earnings))
+        else:
+            descrip = "wow i cant believe youve actually farmed **0 :potato:** ill give u **69 :potato:** cuz i feel kinda bad..."
+            earnings = 69
+
+        userDat["bal"]["wallet"] += earnings
+        embed = discord.Embed(description=descrip, color=0x2ECC71)
+        await ctx.send(embed=embed)
+        del userDat
 
     @farm.error
     async def farm_error(self, ctx: Context, error):
-        pass
+        if isinstance(error, commands.CommandOnCooldown):
+            msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1s)".format(
+                error.retry_after
+            )
+            await ctx.send(msg)
+        else:
+            raise error
 
     @commands.command(aliases=["add"])
     @commands.is_owner()

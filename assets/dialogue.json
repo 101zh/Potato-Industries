@@ -1,0 +1,31 @@
+{
+    "begList" : [
+        "author.mention recived **earnings.money** :potato: from **nosrep** :0",
+        "author.mention found **earnings.money** :potato: while searching through a dumpster",
+        "**earnings.money** :potato: fell from the sky and landed in author.mention's arms",
+        "author.mention summoned **earnings.money** :potato:"
+    ],
+    "farmListPositive" : [
+        "You farmed potatoes and collected **earnings.money** :potato: :0",
+        "When farming for potatoes, a depressed potato drops **earnings.money** :potato: which you pick up",
+        "Some of your potatoes decided to get married and gives birth to **earnings.money** :potato: baby potatoes <:quackity_shy:838192314114506762>",
+        "Dank Memer gives you **earnings.money** :potato: (cursed??)"
+    ],
+    "farmListNegative" : [
+        "You farmed potatoes and collected **earnings.money** :potato: :0",
+        "When farming for potatoes, a depressed potato drops **earnings.money** :potato: which you pick up",
+        "Some of your potatoes decided to get married and gives birth to **earnings.money** :potato: baby potatoes <:quackity_shy:838192314114506762>",
+        "Dank Memer gives you **earnings.money** :potato: (cursed??)"
+    ],
+    "personList" : [
+        "Donald Trump",
+        "Elon Musk",
+        "that one weird dude in your class",
+        "Dank Memer",
+        "<@698218089010954481>",
+        "Eren Jeager",
+        "the kid who thinks its 2018",
+        "Barack Obama",
+        "<@710709742791819274>"
+    ]
+}
