@@ -27,6 +27,179 @@ class EconomyCommands(commands.Cog):
 
         self.hoes = ["diamond hoe", "iron hoe", "stone hoe"]
 
+    @commands.command(aliases=["bal", "potats", "potatoes", "vault"])
+    async def balance(self, ctx: Context, *, mention: discord.Member = None):
+        person = ctx.author
+        if mention != None:
+            person = mention
+
+        await self.createAccount(person)
+        userBankData = await self.getUserBal(person)
+        wallet_amt = userBankData["wallet"]
+        bank_amt = userBankData["bank"]
+        embed = discord.Embed(
+            title=f"{person.name}'s potatoes", color=discord.Colour.green()
+        )
+        embed.add_field(name="Pocket", value=f"{wallet_amt} :potato:")
+        embed.add_field(name="Vault", value=f"{bank_amt} :potato:")
+        embed.set_footer(text="Made by DepressedPotato")
+        embed.set_thumbnail(url=person.avatar)
+        await ctx.send(embed=embed)
+
+    @commands.command(aliases=["dep"])
+    async def deposit(self, ctx: Context, amount=None):
+        """Deposits an amount into invoking user's bank"""
+        await self.createAccount(ctx.author)
+        bal = await self.getUserBal(ctx.author)
+
+        # Exceptions non-integer inputs
+        if amount == None:
+            await ctx.send(
+                "You have to enter an amount to deposit <:seriously:809518766470987799>"
+            )
+            return
+        elif amount == "all" or amount == "max":
+            if bal["wallet"] == 0:
+                await ctx.send("imagine depositing 0 potatoes amirite")
+                return
+
+            amount = bal["wallet"]
+
+        # Exceptions to integer inputs
+        amount = int(amount)
+        if amount > bal["wallet"]:
+            await ctx.send(
+                "You're too poor to deposit potatoes <:XD:806659054721564712>"
+            )
+            return
+        elif amount < 0:
+            await ctx.send(
+                "How the hecc u think you can deposit negative potatoes <:pepe_hehe:816898198315597834>"
+            )
+            return
+        elif amount == 0:
+            await ctx.send("are you *trying* to break me <:sus:809828043244961863>")
+            return
+
+        await ctx.send(f"You deposited **{amount}** :potato: :0")
+        bal["wallet"] -= amount
+        bal["bank"] += amount
+
+    @commands.command(aliases=["with"])
+    async def withdraw(self, ctx: Context, amount=None):
+        """Withdraws an amount into invoking user's wallet"""
+        await self.createAccount(ctx.author)
+
+        # Exceptions non-integer inputs
+        if amount == None:
+            await ctx.send(
+                "You have to enter an amount to withdraw <:seriously:809518766470987799>"
+            )
+            return
+        bal = await self.getUserBal(ctx.author)
+        if amount == "all" or amount == "max":
+            if bal["bank"] == 0:
+                await ctx.send("imagine withdrawing 0 potatoes amirite")
+                return
+            amount = bal["bank"]
+
+        # Exceptions to integer inputs
+        amount = int(amount)
+        if amount > bal["bank"]:
+            await ctx.send(
+                "You're too poor to withdraw that much potatoes <:XD:806659054721564712>"
+            )
+            return
+        if amount < 0:
+            await ctx.send(
+                "How the hecc u think you can withdraw negative potatoes  <:pepe_hehe:816898198315597834>"
+            )
+            return
+        if amount == 0:
+            await ctx.send("are you *trying* to break me <:sus:809828043244961863>")
+            return
+
+        bal["bank"] -= amount
+        bal["wallet"] += amount
+        await ctx.send(f"You withdrew **{amount}** :potato:  :0")
+
+    @commands.command(aliases=["search"])
+    @commands.cooldown(1, 60, commands.BucketType.user)
+    async def beg(self, ctx: Context):
+        """By begging invoking member gains a random number of potatoes"""
+        await self.createAccount(ctx.author)
+
+        user = ctx.author
+        earnings = random.randint(1000, 2000)
+        person = random.choice(self.personList)
+        descrip = (
+            random.choice(self.begList)
+            .replace("nosrep", person)
+            .replace("author.mention", user.mention)
+            .replace("earnings.money", str(earnings))
+        )
+        embed = discord.Embed(description=descrip, color=0x2ECC71)
+        await ctx.send(embed=embed)
+
+        await self.addAmountTo(ctx.author, earnings, "wallet")
+
+    @beg.error
+    async def beg_error(self, ctx: Context, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1min)".format(
+                error.retry_after
+            )
+            await ctx.send(msg)
+        else:
+            raise error
+
+    @commands.command()
+    @commands.cooldown(1, 1, commands.BucketType.user)
+    async def farm(self, ctx: Context):
+        await self.createAccount(ctx.author)
+        userDat = await self.getUserData(ctx.author)
+        earnings = random.randrange(-50, 50)
+
+        for hoeName in self.hoes:
+            if hoeName in userDat["inv"].keys():
+                print(hoeName)
+                print(userDat)
+                if hoeName == "diamond hoe":
+                    earnings = random.randrange(-25, 100)
+                    print("dia")
+                elif hoeName == "iron hoe":
+                    earnings = random.randrange(-25, 75)
+                    print("iron")
+                elif hoeName == "stone hoe":
+                    earnings = random.randrange(-50, 75)
+                    print("stone")
+                break
+        del hoeName
+        
+        descrip = ""
+        if earnings < 0:
+            descrip = random.choice(self.farmDialogueNegative).replace("earnings.money", str(earnings))
+        elif earnings > 0:
+            descrip = random.choice(self.farmDialoguePositive).replace("earnings.money", str(earnings))
+        else:
+            descrip = "wow i cant believe youve actually farmed **0 :potato:** ill give u **69 :potato:** cuz i feel kinda bad..."
+            earnings = 69
+
+        userDat["bal"]["wallet"] += earnings
+        embed = discord.Embed(description=descrip, color=0x2ECC71)
+        await ctx.send(embed=embed)
+        del userDat
+
+    @farm.error
+    async def farm_error(self, ctx: Context, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1s)".format(
+                error.retry_after
+            )
+            await ctx.send(msg)
+        else:
+            raise error
+
     @commands.command()
     async def use(self, ctx: Context, amount_used: int, *, item: str = None):
         pass
@@ -71,179 +244,6 @@ class EconomyCommands(commands.Cog):
     @commands.command(aliases=["gift", "gib", "send", "transfer"])
     async def give(self, ctx: Context, member: discord.Member, amount=None):
         pass
-
-    @commands.command(aliases=["bal", "potats", "potatoes", "vault"])
-    async def balance(self, ctx: Context, *, mention: discord.Member = None):
-        person = ctx.author
-        if mention != None:
-            person = mention
-
-        await self.create_account(person)
-        userBankData = await self.getUserBal(person)
-        wallet_amt = userBankData["wallet"]
-        bank_amt = userBankData["bank"]
-        embed = discord.Embed(
-            title=f"{person.name}'s potatoes", color=discord.Colour.green()
-        )
-        embed.add_field(name="Pocket", value=f"{wallet_amt} :potato:")
-        embed.add_field(name="Vault", value=f"{bank_amt} :potato:")
-        embed.set_footer(text="Made by DepressedPotato")
-        embed.set_thumbnail(url=person.avatar)
-        await ctx.send(embed=embed)
-
-    @commands.command(aliases=["dep"])
-    async def deposit(self, ctx: Context, amount=None):
-        """Deposits an amount into invoking user's bank"""
-        await self.create_account(ctx.author)
-        bal = await self.getUserBal(ctx.author)
-
-        # Exceptions non-integer inputs
-        if amount == None:
-            await ctx.send(
-                "You have to enter an amount to deposit <:seriously:809518766470987799>"
-            )
-            return
-        elif amount == "all" or amount == "max":
-            if bal["wallet"] == 0:
-                await ctx.send("imagine depositing 0 potatoes amirite")
-                return
-
-            amount = bal["wallet"]
-
-        # Exceptions to integer inputs
-        amount = int(amount)
-        if amount > bal["wallet"]:
-            await ctx.send(
-                "You're too poor to deposit potatoes <:XD:806659054721564712>"
-            )
-            return
-        elif amount < 0:
-            await ctx.send(
-                "How the hecc u think you can deposit negative potatoes <:pepe_hehe:816898198315597834>"
-            )
-            return
-        elif amount == 0:
-            await ctx.send("are you *trying* to break me <:sus:809828043244961863>")
-            return
-
-        await ctx.send(f"You deposited **{amount}** :potato: :0")
-        bal["wallet"] -= amount
-        bal["bank"] += amount
-
-    @commands.command(aliases=["with"])
-    async def withdraw(self, ctx: Context, amount=None):
-        """Withdraws an amount into invoking user's wallet"""
-        await self.create_account(ctx.author)
-
-        # Exceptions non-integer inputs
-        if amount == None:
-            await ctx.send(
-                "You have to enter an amount to withdraw <:seriously:809518766470987799>"
-            )
-            return
-        bal = await self.getUserBal(ctx.author)
-        if amount == "all" or amount == "max":
-            if bal["bank"] == 0:
-                await ctx.send("imagine withdrawing 0 potatoes amirite")
-                return
-            amount = bal["bank"]
-
-        # Exceptions to integer inputs
-        amount = int(amount)
-        if amount > bal["bank"]:
-            await ctx.send(
-                "You're too poor to withdraw that much potatoes <:XD:806659054721564712>"
-            )
-            return
-        if amount < 0:
-            await ctx.send(
-                "How the hecc u think you can withdraw negative potatoes  <:pepe_hehe:816898198315597834>"
-            )
-            return
-        if amount == 0:
-            await ctx.send("are you *trying* to break me <:sus:809828043244961863>")
-            return
-
-        bal["bank"] -= amount
-        bal["wallet"] += amount
-        await ctx.send(f"You withdrew **{amount}** :potato:  :0")
-
-    @commands.command(aliases=["search"])
-    @commands.cooldown(1, 60, commands.BucketType.user)
-    async def beg(self, ctx: Context):
-        """By begging invoking member gains a random number of potatoes"""
-        await self.create_account(ctx.author)
-
-        user = ctx.author
-        earnings = random.randint(1000, 2000)
-        person = random.choice(self.personList)
-        descrip = (
-            random.choice(self.begList)
-            .replace("nosrep", person)
-            .replace("author.mention", user.mention)
-            .replace("earnings.money", str(earnings))
-        )
-        embed = discord.Embed(description=descrip, color=0x2ECC71)
-        await ctx.send(embed=embed)
-
-        await self.addAmountTo(ctx.author, earnings, "wallet")
-
-    @beg.error
-    async def beg_error(self, ctx: Context, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1min)".format(
-                error.retry_after
-            )
-            await ctx.send(msg)
-        else:
-            raise error
-
-    @commands.command()
-    @commands.cooldown(1, 1, commands.BucketType.user)
-    async def farm(self, ctx: Context):
-        await self.create_account(ctx.author)
-        userDat = await self.getUserData(ctx.author)
-        earnings = random.randrange(-50, 50)
-
-        for hoeName in self.hoes:
-            if hoeName in userDat["inv"].keys():
-                print(hoeName)
-                print(userDat)
-                if hoeName == "diamond hoe":
-                    earnings = random.randrange(-25, 100)
-                    print("dia")
-                elif hoeName == "iron hoe":
-                    earnings = random.randrange(-25, 75)
-                    print("iron")
-                elif hoeName == "stone hoe":
-                    earnings = random.randrange(-50, 75)
-                    print("stone")
-                break
-        del hoeName
-        
-        descrip = ""
-        if earnings < 0:
-            descrip = random.choice(self.farmDialogueNegative).replace("earnings.money", str(earnings))
-        elif earnings > 0:
-            descrip = random.choice(self.farmDialoguePositive).replace("earnings.money", str(earnings))
-        else:
-            descrip = "wow i cant believe youve actually farmed **0 :potato:** ill give u **69 :potato:** cuz i feel kinda bad..."
-            earnings = 69
-
-        userDat["bal"]["wallet"] += earnings
-        embed = discord.Embed(description=descrip, color=0x2ECC71)
-        await ctx.send(embed=embed)
-        del userDat
-
-    @farm.error
-    async def farm_error(self, ctx: Context, error):
-        if isinstance(error, commands.CommandOnCooldown):
-            msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1s)".format(
-                error.retry_after
-            )
-            await ctx.send(msg)
-        else:
-            raise error
 
     @commands.command(aliases=["add"])
     @commands.is_owner()
@@ -297,7 +297,7 @@ class EconomyCommands(commands.Cog):
         userDat = await self.getUserData(user)
         return userDat["inv"]
 
-    async def create_account(self, user: discord.Member) -> bool:
+    async def createAccount(self, user: discord.Member) -> bool:
         """Creates user data entry, if not already present"""
 
         userID = str(user.id)
