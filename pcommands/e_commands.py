@@ -1,16 +1,17 @@
 import discord, json, random
 from discord.ext import commands
 from discord.ext.commands import Context
+from userDataWrapper import UsersData
 
 import discord.ext
 import discord.ext.tasks
 
 
 class EconomyCommands(commands.Cog):
-    def __init__(self, bot: commands.Bot, usersData: dict):
+    def __init__(self, bot: commands.Bot, usersDataWrapper: UsersData):
         self = self
         self.bot = bot
-        self.usersData = usersData
+        self.usersDataWrapper = usersDataWrapper
 
         with open("assets/dialogue.json", "r") as dJson:
             dialogue = json.load(dJson)
@@ -78,7 +79,7 @@ class EconomyCommands(commands.Cog):
             person = mention
 
         await self.create_account(person)
-        userBankData = await self.getBal(person)
+        userBankData = await self.getUserBal(person)
         wallet_amt = userBankData["wallet"]
         bank_amt = userBankData["bank"]
         embed = discord.Embed(
@@ -94,7 +95,7 @@ class EconomyCommands(commands.Cog):
     async def deposit(self, ctx: Context, amount=None):
         """Deposits an amount into invoking user's bank"""
         await self.create_account(ctx.author)
-        bal = await self.getBal(ctx.author)
+        bal = await self.getUserBal(ctx.author)
 
         # Exceptions non-integer inputs
         if amount == None:
@@ -140,7 +141,7 @@ class EconomyCommands(commands.Cog):
                 "You have to enter an amount to withdraw <:seriously:809518766470987799>"
             )
             return
-        bal = await self.getBal(ctx.author)
+        bal = await self.getUserBal(ctx.author)
         if amount == "all" or amount == "max":
             if bal["bank"] == 0:
                 await ctx.send("imagine withdrawing 0 potatoes amirite")
@@ -168,7 +169,7 @@ class EconomyCommands(commands.Cog):
         await ctx.send(f"You withdrew **{amount}** :potato:  :0")
 
     @commands.command(aliases=["search"])
-    # @commands.cooldown(1, 60, commands.BucketType.user)
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def beg(self, ctx: Context):
         """By begging invoking member gains a random number of potatoes"""
         await self.create_account(ctx.author)
@@ -285,35 +286,35 @@ class EconomyCommands(commands.Cog):
 
     ### Helper Methods
 
-    async def getUser(self, user: discord.Member) -> dict:
-        return self.usersData[str(user.id)]
+    async def getUserData(self, user: discord.Member) -> dict:
+        return self.usersDataWrapper[str(user.id)]
 
-    async def getBal(self, user: discord.Member) -> dict:
-        userDat = await self.getUser(user)
+    async def getUserBal(self, user: discord.Member) -> dict:
+        userDat = await self.getUserData(user)
         return userDat["bal"]
 
-    async def get_inv(self, user: discord.Member) -> dict:
-        userDat = await self.getUser(user)
+    async def getUserInv(self, user: discord.Member) -> dict:
+        userDat = await self.getUserData(user)
         return userDat["inv"]
 
     async def create_account(self, user: discord.Member) -> bool:
         """Creates user data entry, if not already present"""
 
         userID = str(user.id)
-        if userID in self.usersData:
+        if userID in self.usersDataWrapper:
             return False
         else:
-            self.usersData[userID] = {}
-            self.usersData[userID]["bal"] = {}
-            self.usersData[userID]["bal"]["wallet"] = 0
-            self.usersData[userID]["bal"]["bank"] = 0
-            self.usersData[userID]["inv"] = {}
+            self.usersDataWrapper[userID] = {}
+            self.usersDataWrapper[userID]["bal"] = {}
+            self.usersDataWrapper[userID]["bal"]["wallet"] = 0
+            self.usersDataWrapper[userID]["bal"]["bank"] = 0
+            self.usersDataWrapper[userID]["inv"] = {}
         with open("database/userdata.json", "w") as f:
-            json.dump(self.usersData, f)
+            json.dump(self.usersDataWrapper.usersData, f)
         return True
 
     async def addAmountTo(self, user: discord.Member, change=0, mode="wallet"):
-        userBalDat = await self.getBal(user)
+        userBalDat = await self.getUserBal(user)
         userBalDat[mode] += change
 
     async def set_balance(self, user: discord.Member, wallet: int, bank: int):

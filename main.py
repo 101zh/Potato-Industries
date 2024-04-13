@@ -15,7 +15,7 @@ from utils.blacklist import BlacklistCommands as botbans
 import asyncio
 from pcommands.help_commands import HelpCommands
 from pcommands.dev_commands import StaffCommands, DeveloperCommands
-from typing import Union
+from userDataWrapper import UsersData
 
 # feel free to change the name of the import whenever you want
 # :0 ty
@@ -30,7 +30,7 @@ def get_prefix(client, message):
         return "p!"
 
 
-usersData = dict[str, dict[str, dict[str, Union[dict, int, str]]]]({})
+usersDataWrapper = UsersData()
 
 # code setup
 bot = commands.Bot(
@@ -58,7 +58,7 @@ async def on_ready():
     await bot.add_cog(HelpCommands())
     await bot.add_cog(StaffCommands(bot))
     await bot.add_cog(DeveloperCommands(bot, launch_time))
-    await bot.add_cog(EconomyCommands(bot, usersData))
+    await bot.add_cog(EconomyCommands(bot, usersDataWrapper))
     #
 
     if not backupData.is_running():
@@ -80,26 +80,26 @@ async def on_ready():
 @discord.ext.tasks.loop(minutes=10)
 async def backupData():
     with open("database/userdata.json", "w") as f:
-        json.dump(usersData, f)
+        json.dump(usersDataWrapper.usersData, f)
 
 
 async def fetch_all_user_data():
-        global usersData
-        with open("database/userdata.json", "r") as f:
-            usersData = json.load(f)
+    global usersDataWrapper
+    with open("database/userdata.json", "r") as f:
+        usersDataWrapper.usersData = json.load(f)
 
 
 @bot.command(aliases=["back"])  # REMOVE THIS ON LAUNCH
 async def backup(ctx: Context):
     with open("database/userdata.json", "w") as f:
-        json.dump(usersData, f)
+        json.dump(usersDataWrapper.usersData, f)
 
 
 @bot.command()  # REMOVE THIS ON LAUNCH
 async def fetch(ctx: Context):
-    global usersData
+    global usersDataWrapper
     with open("database/userdata.json", "r") as f:
-        usersData = json.load(f)
+        usersDataWrapper.usersData = json.load(f)
 
 
 async def createDatabase():
@@ -130,7 +130,7 @@ async def databaseFilesExists() -> bool:
 
 @bot.command(aliases=["rd", "raw"])
 async def rawdata(ctx: Context):
-    await ctx.send(f"```{usersData}```")
+    await ctx.send(f"```{usersDataWrapper}```")
 
 
 """
