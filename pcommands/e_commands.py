@@ -1,15 +1,15 @@
 import discord, json, random
 from discord.ext import commands
 from discord.ext.commands import Context
-from userDataWrapper import UsersData
-from typing import Union
+from data_wrapper import UsersData, usersDataWrapper
+from typing import Union, Optional
 
 import discord.ext
 import discord.ext.tasks
 
 
 class EconomyCommands(commands.Cog):
-    def __init__(self, bot: commands.Bot, usersDataWrapper: UsersData):
+    def __init__(self, bot: commands.Bot):
         self = self
         self.bot = bot
         self.usersDataWrapper = usersDataWrapper
@@ -309,6 +309,9 @@ class EconomyCommands(commands.Cog):
 
     ### Helper Methods
 
+    async def getAllUsersData(self) -> dict:
+        return self.usersDataWrapper.getAllUserData()
+
     async def getUserData(self, user: discord.Member) -> dict:
         return self.usersDataWrapper[str(user.id)]
 
@@ -333,7 +336,7 @@ class EconomyCommands(commands.Cog):
             self.usersDataWrapper[userID]["bal"]["bank"] = 0
             self.usersDataWrapper[userID]["inv"] = {}
         with open("database/userdata.json", "w") as f:
-            json.dump(self.usersDataWrapper.getAllUserData(), f)
+            json.dump(usersDataWrapper.getAllUserData(), f)
         return True
 
     async def addAmountTo(self, user: discord.Member, change=0, mode="wallet"):
@@ -387,3 +390,7 @@ class EconomyCommands(commands.Cog):
             return 0
 
         return amount
+
+
+async def setup(bot: commands.Bot):
+    await bot.add_cog(EconomyCommands(bot))

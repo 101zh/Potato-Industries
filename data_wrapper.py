@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Union
 
 
 class UsersData:
@@ -33,3 +33,7 @@ class UsersData:
 
     def setAllUsersData(self, newData: dict) -> None:
         self.__allUsersData = newData
+
+
+global usersDataWrapper
+usersDataWrapper = UsersData()

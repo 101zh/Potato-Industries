@@ -15,7 +15,7 @@ from utils.blacklist import BlacklistCommands as botbans
 import asyncio
 from pcommands.help_commands import HelpCommands
 from pcommands.dev_commands import StaffCommands, DeveloperCommands
-from userDataWrapper import UsersData
+from data_wrapper import UsersData, usersDataWrapper
 
 # feel free to change the name of the import whenever you want
 # :0 ty
@@ -29,8 +29,6 @@ def get_prefix(client, message):
     except:
         return "p!"
 
-
-usersDataWrapper = UsersData()
 
 # code setup
 client = commands.Bot(
@@ -58,7 +56,7 @@ async def on_ready():
     await client.add_cog(HelpCommands())
     await client.add_cog(StaffCommands(client))
     await client.add_cog(DeveloperCommands(client, launch_time))
-    await client.add_cog(EconomyCommands(client, usersDataWrapper))
+    await client.load_extension("pcommands.e_commands")
     #
 
     if not backupData.is_running():
@@ -100,6 +98,12 @@ async def fetch(ctx: Context):
     global usersDataWrapper
     with open("database/userdata.json", "r") as f:
         usersDataWrapper.setAllUsersData(json.load(f))
+
+
+@client.command(aliases=["r"])
+async def reload(ctx: Context):
+    await client.reload_extension("pcommands.e_commands")
+    await ctx.send("`New code loaded in`")
 
 
 async def createDatabase():
