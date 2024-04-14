@@ -33,10 +33,10 @@ def get_prefix(client, message):
 usersDataWrapper = UsersData()
 
 # code setup
-bot = commands.Bot(
+client = commands.Bot(
     command_prefix=get_prefix, intents=discord.Intents.all(), case_insensitive=True
 )
-bot.remove_command("help")
+client.remove_command("help")
 WEBHOOK_URL = "<redacted>"
 redditlist = [
     "https://www.reddit.com/r/memes/new.json",
@@ -46,29 +46,29 @@ redditlist = [
 
 
 # startup and status
-@bot.event
+@client.event
 async def on_ready():
-    print(f"{bot.user.name} is ready :D")
+    print(f"{client.user.name} is ready :D")
     if not await databaseFilesExists():
         await createDatabase()
 
     await fetch_all_user_data()
 
     # Add bot commands (in pcommands)
-    await bot.add_cog(HelpCommands())
-    await bot.add_cog(StaffCommands(bot))
-    await bot.add_cog(DeveloperCommands(bot, launch_time))
-    await bot.add_cog(EconomyCommands(bot, usersDataWrapper))
+    await client.add_cog(HelpCommands())
+    await client.add_cog(StaffCommands(client))
+    await client.add_cog(DeveloperCommands(client, launch_time))
+    await client.add_cog(EconomyCommands(client, usersDataWrapper))
     #
 
     if not backupData.is_running():
         backupData.start()
 
-    servers = len(bot.guilds)
+    servers = len(client.guilds)
     members = 0
-    for guild in bot.guilds:
+    for guild in client.guilds:
         members += guild.member_count - 1
-    await bot.change_presence(
+    await client.change_presence(
         status=discord.Status.dnd,
         activity=discord.Activity(
             type=discord.ActivityType.watching,
@@ -89,13 +89,13 @@ async def fetch_all_user_data():
         usersDataWrapper.setAllUsersData(json.load(f))
 
 
-@bot.command(aliases=["back"])  # REMOVE THIS ON LAUNCH
+@client.command(aliases=["back"])  # REMOVE THIS ON LAUNCH
 async def backup(ctx: Context):
     with open("database/userdata.json", "w") as f:
         json.dump(usersDataWrapper.getAllUserData(), f)
 
 
-@bot.command()  # REMOVE THIS ON LAUNCH
+@client.command()  # REMOVE THIS ON LAUNCH
 async def fetch(ctx: Context):
     global usersDataWrapper
     with open("database/userdata.json", "r") as f:
@@ -128,7 +128,7 @@ async def databaseFilesExists() -> bool:
     )
 
 
-@bot.command(aliases=["rd", "raw"])
+@client.command(aliases=["rd", "raw"])
 async def rawdata(ctx: Context):
     await ctx.send(f"```{usersDataWrapper}```")
 
@@ -195,11 +195,11 @@ blacklisted = []
 # bruh
 
 
-@bot.event
+@client.event
 async def on_message(message: discord.Message):
     # Implementing botban check.
     # ok
-    if message.content.startswith("p!") and message.author != bot.user:
+    if message.content.startswith("p!") and message.author != client.user:
         try:
             print(f"{message.content} | {message.author.name} | {message.guild.name}")
             botbanned = botbans.check_blacklist(message.author.id)
@@ -211,13 +211,13 @@ async def on_message(message: discord.Message):
                 return
         except Exception:
             print("ono something went wrong ;-;")
-    if message.channel.id in bot.ids and message.author != bot.user:
+    if message.channel.id in client.ids and message.author != client.user:
         if message.content != "e":
             await message.delete()
         else:
             await message.channel.send("e")
     try:
-        if message.mentions[0] == bot.user:
+        if message.mentions[0] == client.user:
             with open("database/prefixes.json", "r") as f:
                 prefixes = json.load(f)
             pre = prefixes[str(message.guild.id)]
@@ -227,14 +227,14 @@ async def on_message(message: discord.Message):
                 await message.channel.send(f"`{e}`")
     except:
         pass
-    if message.author == bot.user:
+    if message.author == client.user:
         return
     if message.author.bot:
         return
-    await bot.process_commands(message)
+    await client.process_commands(message)
 
 
-@bot.command()
+@client.command()
 async def poll(ctx: Context, *, message=None):
     if message == None:
         await ctx.send(f"Cannot create a poll with no message!")
@@ -250,7 +250,7 @@ async def poll(ctx: Context, *, message=None):
         await ctx.send(i)
 
         try:
-            msg = await bot.wait_for("message", timeout=30.0, check=check)
+            msg = await client.wait_for("message", timeout=30.0, check=check)
 
         except asyncio.TimeoutError:
             await ctx.send("Setup timed out, please be quicker next time!")
@@ -266,7 +266,7 @@ async def poll(ctx: Context, *, message=None):
         )
         return
 
-    channel = bot.get_channel(c_id)
+    channel = client.get_channel(c_id)
 
     embed = discord.Embed(
         title="Poll", description=f"{message}", colour=discord.Color.blue()
@@ -279,7 +279,7 @@ async def poll(ctx: Context, *, message=None):
     await message.add_reaction("<:cringe:807062463383863336>")
 
 
-@bot.command()
+@client.command()
 async def profile(ctx: Context, *, member: discord.Member = None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
@@ -330,14 +330,14 @@ async def profile(ctx: Context, *, member: discord.Member = None):
 
 try:
     with open("database/channels.json") as f:
-        bot.ids = set(json.load(f))
+        client.ids = set(json.load(f))
     print("Loaded channels file")
 except Exception as e:
-    bot.ids = set()
+    client.ids = set()
     print(e)
 
 
-@bot.command()
+@client.command()
 @commands.cooldown(1, 60, commands.BucketType.user)
 async def passive(ctx: Context, mode=None):
     if ctx.author.id in blacklisted:
@@ -349,18 +349,18 @@ async def passive(ctx: Context, mode=None):
             passive.reset_cooldown(ctx)
         else:
             if mode == "true" or mode == "on" or mode == "yuh":
-                if ctx.author.id in bot.ids:
+                if ctx.author.id in client.ids:
                     await ctx.channel.send("You're already passive.")
                     return
-                bot.ids.add(ctx.author.id)
+                client.ids.add(ctx.author.id)
                 with open("database/channels.json", "w") as f:
-                    json.dump(list(bot.ids), f)
+                    json.dump(list(client.ids), f)
                 await ctx.channel.send("You're passive now.")
             elif mode == "false" or mode == "off" or mode == "nuh":
-                if ctx.author.id in bot.ids:
-                    bot.ids.remove(ctx.author.id)
+                if ctx.author.id in client.ids:
+                    client.ids.remove(ctx.author.id)
                     with open("database/channels.json", "w") as f:
-                        json.dump(list(bot.ids), f)
+                        json.dump(list(client.ids), f)
                     await ctx.channel.send("You're now impassive.")
                 else:
                     await ctx.send("You're already impassive.")
@@ -425,7 +425,7 @@ async def passive_error(ctx: Context, error):
 # mogus
 
 
-@bot.command()
+@client.command()
 async def sudo(ctx: Context, member: discord.Member, *, message=None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
@@ -447,12 +447,12 @@ def checkint(s):
         return False
 
 
-@bot.command()
+@client.command()
 @commands.is_owner()
 async def serverlist(ctx: Context):
     a = 0
     e = []
-    for i in bot.guilds:
+    for i in client.guilds:
         a += 1
         e.append(i.name)
     await ctx.send(e)
@@ -474,16 +474,16 @@ async def update_bank(user, change=0, mode="wallet") -> list[int]:
     return bal"""
 
 
-@bot.command()
+@client.command()
 async def botpic(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
         return
     else:
-        await ctx.send(bot.user.avatar)
+        await ctx.send(client.user.avatar)
 
 
-@bot.command()
+@client.command()
 async def avatar(ctx: Context, *, member: discord.Member = None):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
@@ -495,7 +495,7 @@ async def avatar(ctx: Context, *, member: discord.Member = None):
             await ctx.send(str(ctx.author.avatar))
 
 
-@bot.command()
+@client.command()
 async def customembed(ctx: Context, color: discord.Colour, title, *, description):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
@@ -507,7 +507,7 @@ async def customembed(ctx: Context, color: discord.Colour, title, *, description
         await ctx.channel.send(embed=embed)
 
 
-@bot.command(pass_context=True)
+@client.command(pass_context=True)
 @commands.cooldown(1, 2, commands.BucketType.user)
 async def meme(ctx: Context):
     if ctx.author.id in blacklisted:
@@ -538,7 +538,7 @@ async def meme_error(ctx: Context, error):
         raise error
 
 
-@bot.event
+@client.event
 async def on_guild_join(guild):
     with open("database/prefixes.json", "r") as f:
         prefixes = json.load(f)
@@ -553,7 +553,7 @@ async def on_guild_join(guild):
         break
 
 
-@bot.command()
+@client.command()
 @commands.has_permissions(administrator=True)
 async def addrole(ctx: Context, member: discord.Member, role: discord.Role):
     await ctx.send("Role added")
@@ -567,7 +567,7 @@ async def addrole_error(ctx: Context, error):
         await ctx.send("You cant do that! (u need perms)")
 
 
-@bot.command()
+@client.command()
 async def guild(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
@@ -600,7 +600,7 @@ async def guild(ctx: Context):
         await ctx.channel.send(embed=embed)
 
 
-@bot.command()
+@client.command()
 async def fact(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
@@ -614,7 +614,7 @@ async def fact(ctx: Context):
             await ctx.send(embed=embed)
 
 
-@bot.command()
+@client.command()
 async def invite(ctx: Context):
     embed = discord.Embed(
         title="Click here invite",
@@ -630,7 +630,7 @@ async def invite(ctx: Context):
     await ctx.send(embed=embed)
 
 
-@bot.command()
+@client.command()
 async def vote(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
@@ -645,7 +645,7 @@ async def vote(ctx: Context):
         await ctx.send(embed=embed)
 
 
-@bot.command()
+@client.command()
 async def about(ctx: Context):
     if ctx.author.id in blacklisted:
         await ctx.send("you are temporarily blacklisted/banned from PI")
@@ -677,4 +677,4 @@ async def about(ctx: Context):
 
 
 keep_alive()
-bot.run(os.getenv("password"))
+client.run(os.getenv("password"))
