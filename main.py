@@ -80,26 +80,26 @@ async def on_ready():
 @discord.ext.tasks.loop(minutes=10)
 async def backupData():
     with open("database/userdata.json", "w") as f:
-        json.dump(usersDataWrapper.usersData, f)
+        json.dump(usersDataWrapper.getAllUserData(), f)
 
 
 async def fetch_all_user_data():
     global usersDataWrapper
     with open("database/userdata.json", "r") as f:
-        usersDataWrapper.usersData = json.load(f)
+        usersDataWrapper.setAllUsersData(json.load(f))
 
 
 @bot.command(aliases=["back"])  # REMOVE THIS ON LAUNCH
 async def backup(ctx: Context):
     with open("database/userdata.json", "w") as f:
-        json.dump(usersDataWrapper.usersData, f)
+        json.dump(usersDataWrapper.getAllUserData(), f)
 
 
 @bot.command()  # REMOVE THIS ON LAUNCH
 async def fetch(ctx: Context):
     global usersDataWrapper
     with open("database/userdata.json", "r") as f:
-        usersDataWrapper.usersData = json.load(f)
+        usersDataWrapper.setAllUsersData(json.load(f))
 
 
 async def createDatabase():

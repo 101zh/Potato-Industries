@@ -333,7 +333,7 @@ class EconomyCommands(commands.Cog):
             self.usersDataWrapper[userID]["bal"]["bank"] = 0
             self.usersDataWrapper[userID]["inv"] = {}
         with open("database/userdata.json", "w") as f:
-            json.dump(self.usersDataWrapper.usersData, f)
+            json.dump(self.usersDataWrapper.getAllUserData(), f)
         return True
 
     async def addAmountTo(self, user: discord.Member, change=0, mode="wallet"):
