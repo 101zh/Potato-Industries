@@ -282,8 +282,36 @@ class EconomyCommands(commands.Cog):
             raise error
 
     @commands.command()
-    async def buy(self, ctx: Context, amount: int, item: str):
-        pass
+    async def buy(self, ctx: Context, amount: int, *, itemID: str):
+        await self.createAccount(ctx.author)
+        if amount <= 0:
+            await ctx.send("hey, are you trying to break me?")
+            return
+
+        print(itemID)
+        itemID = itemID.lower().replace(" ", "")
+        if itemID not in self.shopItems.keys():
+            await ctx.send("That isn't in the shop")
+            return
+        userBalDat = await self.getUserBal(ctx.author)
+        item = self.getItem(itemID)
+        cost = item["cost"] * amount
+
+        itemMsg = item["name"]
+        if amount == 1:
+            itemMsg = f"a **{itemMsg}**"
+        else:
+            itemMsg = f"**{amount} {itemMsg}s**"
+
+        if cost > userBalDat["wallet"]:
+            await ctx.send(
+                f"You don't have enough potatoes in your pocket to purchase {itemMsg} <:XD:806659054721564712>"
+            )
+            return
+
+        userBalDat["wallet"] -= cost
+        await ctx.send(f"You just bought {itemMsg} :0")
+        await self.addToInv(ctx.author, itemID, amount)
 
     @commands.command(aliases=["cya"])
     async def sell(self, ctx: Context, amount=1, *, item):
@@ -388,7 +416,10 @@ class EconomyCommands(commands.Cog):
             userInvDat[itemID] = amount
 
     def getItemName(self, itemID: str) -> str:
-        return str(self.shopItems[itemID]["name"])
+        return self.getItem(itemID)["name"]
+
+    def getItem(self, itemID: str) -> dict:
+        return self.shopItems[itemID]
 
     async def addAmountTo(self, user: discord.Member, change=0, mode="wallet"):
         userBalDat = await self.getUserBal(user)
