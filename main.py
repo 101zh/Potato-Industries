@@ -15,7 +15,7 @@ from utils.blacklist import BlacklistCommands as botbans
 import asyncio
 from pcommands.help_commands import HelpCommands
 from pcommands.dev_commands import StaffCommands, DeveloperCommands
-from data_wrapper import UsersData, usersDataWrapper
+from data_wrapper import UsersData, usersDataWrapper, launch_time
 
 # feel free to change the name of the import whenever you want
 # :0 ty
@@ -54,8 +54,7 @@ async def on_ready():
 
     # Add bot commands (in pcommands)
     await client.add_cog(HelpCommands())
-    await client.add_cog(StaffCommands(client))
-    await client.add_cog(DeveloperCommands(client, launch_time))
+    await client.load_extension("pcommands.dev_commands")
     await client.load_extension("pcommands.e_commands")
     #
 
@@ -102,6 +101,7 @@ async def fetch(ctx: Context):
 
 @client.command(aliases=["r"]) # REMOVE THIS ON LAUNCH
 async def reload(ctx: Context):
+    await client.reload_extension("pcommands.dev_commands")
     await client.reload_extension("pcommands.e_commands")
     await ctx.send("`New code loaded in`")
 

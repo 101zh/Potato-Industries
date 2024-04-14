@@ -1,4 +1,5 @@
 from typing import Union
+from datetime import timezone, datetime
 
 
 class UsersData:
@@ -37,3 +38,5 @@ class UsersData:
 
 global usersDataWrapper
 usersDataWrapper = UsersData()
+global launch_time
+launch_time = launch_time = datetime.now(timezone.utc)

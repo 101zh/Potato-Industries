@@ -4,6 +4,7 @@ import os
 from discord.ext import commands
 from discord.ext.commands import Context
 from datetime import datetime, timezone
+from data_wrapper import launch_time
 
 """
 Untested
@@ -274,7 +275,7 @@ class StaffCommands(commands.Cog):
 
 
 class DeveloperCommands(commands.Cog):
-    def __init__(self, bot: commands.Bot, launch_time: datetime):
+    def __init__(self, bot: commands.Bot):
         self = self
         self.bot = bot
         self.launch_time = launch_time
@@ -381,3 +382,8 @@ class DeveloperCommands(commands.Cog):
         except Exception as e:
             print(e)
             await ctx.send(f"Error: `{e}`")
+
+
+async def setup(bot: commands.Bot):
+    await bot.add_cog(DeveloperCommands(bot))
+    await bot.add_cog(StaffCommands(bot))
