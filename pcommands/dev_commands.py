@@ -35,15 +35,15 @@ class StaffCommands(commands.Cog):
     async def nickall(self, ctx: Context, *, name):
         count = 0
         for i in ctx.guild.members:
-            if i.bot:
-                continue
             try:
                 await i.edit(nick=name)
             except:
                 count += 1
+            if i.bot:
+                continue
         if count == 0:
             await ctx.send(
-                f"Nickname for {Member.mention} successfully changed to `{name}` :white_check_mark:"
+                f"Nickname for everyone successfully changed to `{name}` :white_check_mark:"
             )
         else:
             await ctx.send(
