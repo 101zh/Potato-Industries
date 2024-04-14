@@ -205,6 +205,59 @@ class EconomyCommands(commands.Cog):
         else:
             raise error
 
+    @commands.command(aliases=["store", "market"])
+    async def shop(self, ctx: Context):
+        em = discord.Embed(color=0x2ECC71)
+        for k, v in self.shopItems.items():
+            name = "**" + str(v["name"]) + "**"
+            id = k
+            price = v["cost"]
+            desc = v["description"]
+            if name == "**Test Item**":
+                pass
+            else:
+                em.add_field(
+                    name=name,
+                    value=f"\t ID: `{id}`\n\tPrice: **{price}**\n\t {desc}",
+                    inline=False,
+                )
+                em.set_author(
+                    name="Potato Industry Tools Shack",
+                    icon_url="https://cdn.discordapp.com/avatars/839966871143186472/1a802ca9786c5bf56cde2ca3ed14dce6.webp?size=1024",
+                )
+        await ctx.send(embed=em)
+
+    @commands.command(aliases=["tools", "inventory", "inv", "shack"])
+    async def shed(self, ctx: Context, *, member: Optional[discord.Member] = None):
+        # await ctx.send("test")
+        user = ctx.author
+        if member != None:
+            user = member
+
+        await self.createAccount(user)
+        inv = await self.getUserInv(user)
+        em = discord.Embed(title=f"{user.name}'s Shed", color=0x7289DA)
+        for k, v in inv.items():
+            name = str(self.shopItems[k]["name"])
+            sell = self.shopItems[k]["sell"]
+            amount = v
+            em.add_field(
+                name=name + " - " + str(v),
+                value=f":1412-reply:Sells for: `"
+                + str(sell)
+                + "`",  # TODO: Change emoji
+                inline=False,
+            )
+        await ctx.send(embed=em)
+
+    @commands.command()
+    async def buy(self, ctx: Context, amount: int, item: str):
+        pass
+
+    @commands.command(aliases=["cya"])
+    async def sell(self, ctx: Context, amount=1, *, item):
+        pass
+
     @commands.command()
     async def use(self, ctx: Context, amount_used: int, *, item: str = None):
         pass
@@ -215,10 +268,6 @@ class EconomyCommands(commands.Cog):
         return -1
 
     async def use_lottery_potato(self, ctx: Context, amount: int) -> None:
-        pass
-
-    @commands.command(aliases=["cya"])
-    async def sell(self, ctx: Context, amount=1, *, item):
         pass
 
     @commands.command()
@@ -233,36 +282,6 @@ class EconomyCommands(commands.Cog):
     @dig.error
     async def dig_error(self, ctx: Context, error):
         pass
-
-    @commands.command(aliases=["tools", "inventory", "inv", "shack"])
-    async def shed(self, ctx: Context, *, member: discord.Member = None):
-        pass
-
-    @commands.command()
-    async def buy(self, ctx: Context, amount: int, item: str):
-        pass
-
-    @commands.command(aliases=["store", "market"])
-    async def shop(self, ctx: Context):
-        em = discord.Embed(color=0x2ECC71)
-        for k, v in self.shopItems.items():
-            name = "**" + str(v["name"]) + "**"
-            id = k
-            price = v["cost"]
-            desc = v["description"]
-            if name == "**Test Item**":
-                pass
-            else:
-                em.add_field(
-                    name=name,
-                    value=f"\t id `{id}`\n\tPrice: **{price}**\n\t {desc}",
-                    inline=False,
-                )
-                em.set_author(
-                    name="Potato Industry Tools Shack",
-                    icon_url="https://cdn.discordapp.com/avatars/839966871143186472/1a802ca9786c5bf56cde2ca3ed14dce6.webp?size=1024",
-                )
-        await ctx.send(embed=em)
 
     @commands.command(aliases=["gift", "gib", "send", "transfer"])
     async def give(self, ctx: Context, member: discord.Member, amount=None):

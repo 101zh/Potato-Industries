@@ -100,7 +100,7 @@ async def fetch(ctx: Context):
         usersDataWrapper.setAllUsersData(json.load(f))
 
 
-@client.command(aliases=["r"])
+@client.command(aliases=["r"]) # REMOVE THIS ON LAUNCH
 async def reload(ctx: Context):
     await client.reload_extension("pcommands.e_commands")
     await ctx.send("`New code loaded in`")
