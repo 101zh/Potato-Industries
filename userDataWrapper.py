@@ -16,10 +16,14 @@ class UsersData:
     def keys(self):
         return self.usersData.keys()
 
+    def items(self):
+        return self.usersData.items()
+
+    def values(self):
+        return self.usersData.values()
+
     def __contains__(self, key: object) -> bool:
         return self.usersData.__contains__(key)
 
     def __str__(self) -> str:
         return self.usersData.__str__()
-    
-    
