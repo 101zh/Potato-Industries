@@ -48,7 +48,7 @@ class StaffCommands(commands.Cog):
         else:
             await ctx.send(
                 f"Nickname for {count} couldn't be changed. Check perms. Successfully changed {ctx.guild.member_count - count} to `{name}` :white_check_mark:"
-            )
+            ) 
 
     @nickall.error
     async def nickall_error(self, ctx: Context, error):
