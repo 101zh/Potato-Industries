@@ -238,7 +238,7 @@ class EconomyCommands(commands.Cog):
         inv = await self.getUserInv(user)
         em = discord.Embed(title=f"{user.name}'s Shed", color=0x7289DA)
         for k, v in inv.items():
-            name = str(self.shopItems[k]["name"])
+            name = self.getItemName(k)
             sell = self.shopItems[k]["sell"]
             amount = v
             em.add_field(
@@ -249,6 +249,37 @@ class EconomyCommands(commands.Cog):
                 inline=False,
             )
         await ctx.send(embed=em)
+
+    @commands.command()
+    @commands.cooldown(1, 2700, commands.BucketType.user)
+    async def dig(self, ctx: Context):
+        rng = random.random() * 100 + 1  # [1,100]
+        itemID = ""
+        if rng <= 2.5:
+            itemID = "goldenpotato"  # 2.5% chance
+        elif rng <= 20:
+            itemID = "invisiblepotato"  # 17.5% chance
+        elif rng <= 50:
+            itemID = "potatochip"  # 30% chance
+        else:
+            itemID = "rottenpotato"  # 50% chance
+
+        await self.addToInv(ctx.author, itemID, 1)
+        embed = discord.Embed(
+            description=f"You dug up **1 {self.getItemName(itemID)}** :0",
+            color=discord.Colour.blue(),
+        )
+        await ctx.send(embed=embed)
+
+    @dig.error
+    async def dig_error(self, ctx: Context, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            msg = "Slow it down!! Try again in **{:.2f}s** (cooldown: 1hr)".format(
+                error.retry_after
+            )
+            await ctx.send(msg)
+        else:
+            raise error
 
     @commands.command()
     async def buy(self, ctx: Context, amount: int, item: str):
@@ -270,17 +301,8 @@ class EconomyCommands(commands.Cog):
     async def use_lottery_potato(self, ctx: Context, amount: int) -> None:
         pass
 
-    @commands.command()
-    @commands.cooldown(1, 2700, commands.BucketType.user)
-    async def dig(self, ctx: Context):
-        pass
-
     @sell.error
     async def sell_error(self, ctx: Context, error):
-        pass
-
-    @dig.error
-    async def dig_error(self, ctx: Context, error):
         pass
 
     @commands.command(aliases=["gift", "gib", "send", "transfer"])
@@ -357,6 +379,16 @@ class EconomyCommands(commands.Cog):
         with open("database/userdata.json", "w") as f:
             json.dump(usersDataWrapper.getAllUserData(), f)
         return True
+
+    async def addToInv(self, user: discord.Member, itemID: str, amount: int) -> None:
+        userInvDat = await self.getUserInv(user)
+        try:
+            userInvDat[itemID] += amount
+        except KeyError:
+            userInvDat[itemID] = amount
+
+    def getItemName(self, itemID: str) -> str:
+        return str(self.shopItems[itemID]["name"])
 
     async def addAmountTo(self, user: discord.Member, change=0, mode="wallet"):
         userBalDat = await self.getUserBal(user)
