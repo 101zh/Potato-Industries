@@ -1,4 +1,5 @@
 import discord, json, random
+from discord import User, Member
 from discord.ext import commands
 from discord.ext.commands import Context
 from data_wrapper import UsersData, usersDataWrapper
@@ -29,13 +30,15 @@ class EconomyCommands(commands.Cog):
         self.hoes = ["diamond hoe", "iron hoe", "stone hoe"]
 
     @commands.command(aliases=["bal", "potats", "potatoes", "vault"])
-    async def balance(self, ctx: Context, *, mention: discord.Member = None):
+    async def balance(
+        self, ctx: Context, *, mention: Optional[Union[User, Member]] = None
+    ):
         person = ctx.author
         if mention != None:
             person = mention
 
-        await self.createAccount(person)
-        userBankData = await self.getUserBal(person)
+        self.createAccount(person)
+        userBankData = self.getUserBal(person)
         wallet_amt = userBankData["wallet"]
         bank_amt = userBankData["bank"]
         embed = discord.Embed(
@@ -50,8 +53,8 @@ class EconomyCommands(commands.Cog):
     @commands.command(aliases=["dep"])
     async def deposit(self, ctx: Context, amount=None):
         """Deposits an amount into invoking user's bank"""
-        await self.createAccount(ctx.author)
-        bal = await self.getUserBal(ctx.author)
+        self.createAccount(ctx.author)
+        bal = self.getUserBal(ctx.author)
 
         # Exceptions non-integer inputs
         if amount == None:
@@ -89,7 +92,7 @@ class EconomyCommands(commands.Cog):
     @commands.command(aliases=["with"])
     async def withdraw(self, ctx: Context, amount=None):
         """Withdraws an amount into invoking user's wallet"""
-        await self.createAccount(ctx.author)
+        self.createAccount(ctx.author)
 
         # Exceptions non-integer inputs
         if amount == None:
@@ -97,7 +100,7 @@ class EconomyCommands(commands.Cog):
                 "You have to enter an amount to withdraw <:seriously:809518766470987799>"
             )
             return
-        bal = await self.getUserBal(ctx.author)
+        bal = self.getUserBal(ctx.author)
         if amount == "all" or amount == "max":
             if bal["bank"] == 0:
                 await ctx.send("imagine withdrawing 0 potatoes amirite")
@@ -128,7 +131,7 @@ class EconomyCommands(commands.Cog):
     @commands.cooldown(1, 60, commands.BucketType.user)
     async def beg(self, ctx: Context):
         """By begging invoking member gains a random number of potatoes"""
-        await self.createAccount(ctx.author)
+        self.createAccount(ctx.author)
 
         user = ctx.author
         earnings = random.randint(1000, 2000)
@@ -157,8 +160,8 @@ class EconomyCommands(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 1, commands.BucketType.user)
     async def farm(self, ctx: Context):
-        await self.createAccount(ctx.author)
-        userDat = await self.getUserData(ctx.author)
+        self.createAccount(ctx.author)
+        userDat = self.getUserData(ctx.author)
         earnings = random.randrange(-50, 50)
 
         for hoeName in self.hoes:
@@ -228,14 +231,14 @@ class EconomyCommands(commands.Cog):
         await ctx.send(embed=em)
 
     @commands.command(aliases=["tools", "inventory", "inv", "shack"])
-    async def shed(self, ctx: Context, *, member: Optional[discord.Member] = None):
+    async def shed(self, ctx: Context, *, member: Optional[Member] = None):
         # await ctx.send("test")
         user = ctx.author
         if member != None:
             user = member
 
-        await self.createAccount(user)
-        inv = await self.getUserInv(user)
+        self.createAccount(user)
+        inv = self.getUserInv(user)
         em = discord.Embed(title=f"{user.name}'s Shed", color=0x7289DA)
         for k, v in inv.items():
             name = self.getItemName(k)
@@ -283,7 +286,7 @@ class EconomyCommands(commands.Cog):
 
     @commands.command()
     async def buy(self, ctx: Context, amount: int, *, itemID: str):
-        await self.createAccount(ctx.author)
+        self.createAccount(ctx.author)
         if amount <= 0:
             await ctx.send("hey, are you trying to break me?")
             return
@@ -293,7 +296,7 @@ class EconomyCommands(commands.Cog):
         if itemID not in self.shopItems.keys():
             await ctx.send("That isn't in the shop")
             return
-        userBalDat = await self.getUserBal(ctx.author)
+        userBalDat = self.getUserBal(ctx.author)
         item = self.getItem(itemID)
         cost = item["cost"] * amount
 
@@ -318,13 +321,8 @@ class EconomyCommands(commands.Cog):
         pass
 
     @commands.command()
-    async def use(self, ctx: Context, amount_used: int, *, item: str = None):
+    async def use(self, ctx: Context, amount_used: int, *, item: Optional[str] = None):
         pass
-
-    async def update_user_shed(
-        self, user: discord.Member, item: str, amount_used: int
-    ) -> int:
-        return -1
 
     async def use_lottery_potato(self, ctx: Context, amount: int) -> None:
         pass
@@ -334,12 +332,12 @@ class EconomyCommands(commands.Cog):
         pass
 
     @commands.command(aliases=["gift", "gib", "send", "transfer"])
-    async def give(self, ctx: Context, member: discord.Member, amount=None):
+    async def give(self, ctx: Context, member: Union[User, Member], amount=None):
         pass
 
     @commands.command(aliases=["add"])
     @commands.is_owner()
-    async def addpotatoes(self, ctx: Context, member: discord.Member, amount):
+    async def addpotatoes(self, ctx: Context, member: Union[User, Member], amount):
         pass
 
     @addpotatoes.error
@@ -352,7 +350,7 @@ class EconomyCommands(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 3600, commands.BucketType.user)
-    async def sabotage(self, ctx: Context, *, member: discord.Member):
+    async def sabotage(self, ctx: Context, *, member: Union[User, Member]):
         pass
 
     @sabotage.error
@@ -361,7 +359,7 @@ class EconomyCommands(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 300, commands.BucketType.user)
-    async def rob(self, ctx: Context, *, member: discord.Member):
+    async def rob(self, ctx: Context, *, member: Union[User, Member]):
         pass
 
     @rob.error
@@ -378,21 +376,19 @@ class EconomyCommands(commands.Cog):
 
     ### Helper Methods
 
-    async def getAllUsersData(self) -> dict:
+    def getAllUsersData(self) -> dict:
         return self.usersDataWrapper.getAllUserData()
 
-    async def getUserData(self, user: discord.Member) -> dict:
+    def getUserData(self, user: Union[User, Member]) -> dict:
         return self.usersDataWrapper[str(user.id)]
 
-    async def getUserBal(self, user: discord.Member) -> dict:
-        userDat = await self.getUserData(user)
-        return userDat["bal"]
+    def getUserBal(self, user: Union[User, Member]) -> dict:
+        return self.getUserData(user)["bal"]
 
-    async def getUserInv(self, user: discord.Member) -> dict:
-        userDat = await self.getUserData(user)
-        return userDat["inv"]
+    def getUserInv(self, user: Union[User, Member]) -> dict:
+        return self.getUserData(user)["inv"]
 
-    async def createAccount(self, user: discord.Member) -> bool:
+    def createAccount(self, user: Union[User, Member]) -> bool:
         """Creates user data entry, if not already present"""
 
         userID = str(user.id)
@@ -408,8 +404,10 @@ class EconomyCommands(commands.Cog):
             json.dump(usersDataWrapper.getAllUserData(), f)
         return True
 
-    async def addToInv(self, user: discord.Member, itemID: str, amount: int) -> None:
-        userInvDat = await self.getUserInv(user)
+    async def addToInv(
+        self, user: Union[User, Member], itemID: str, amount: int
+    ) -> None:
+        userInvDat = self.getUserInv(user)
         try:
             userInvDat[itemID] += amount
         except KeyError:
@@ -421,57 +419,8 @@ class EconomyCommands(commands.Cog):
     def getItem(self, itemID: str) -> dict:
         return self.shopItems[itemID]
 
-    async def addAmountTo(self, user: discord.Member, change=0, mode="wallet"):
-        userBalDat = await self.getUserBal(user)
-        userBalDat[mode] += change
-
-    async def set_balance(self, user: discord.Member, wallet: int, bank: int):
-        pass
-
-    async def sell_this(self, user, item_name, amount, price=None):
-        pass
-
-    async def get_shop_item(self, item_name: str) -> dict | None:
-        pass
-
-    async def get_shop_items(self) -> dict:
-        pass
-
-    async def buy_this(self, user, item_name: str, amount: int):
-        pass
-
-    async def trueDepositAmount(self, ctx: Context, bal: dict, amount=None) -> int:
-        """returns true amount to deposit\n
-        A valid amount is > 0
-        """
-        if amount == None:
-            await ctx.send(
-                "You have to enter an amount to deposit <:seriously:809518766470987799>"
-            )
-            return 0
-        elif amount == "all" or amount == "max":
-            if bal["wallet"] == 0:
-                await ctx.send("imagine depositing 0 potatoes amirite")
-                return 0
-            else:
-                amount = bal["wallet"]
-
-        amount = int(amount)
-        if amount > bal["wallet"]:
-            await ctx.send(
-                "You're too poor to deposit potatoes <:XD:806659054721564712>"
-            )
-            return 0
-        elif amount < 0:
-            await ctx.send(
-                "How the hecc u think you can deposit negative potatoes <:pepe_hehe:816898198315597834>"
-            )
-            return 0
-        elif amount == 0:
-            await ctx.send("are you *trying* to break me <:sus:809828043244961863>")
-            return 0
-
-        return amount
+    async def addAmountTo(self, user: Union[User, Member], change=0, mode="wallet"):
+        self.getUserBal(user)[mode] += change
 
 
 async def setup(bot: commands.Bot):
