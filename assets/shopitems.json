@@ -45,7 +45,7 @@
         "sell": 45000,
         "sticky": true,
         "description": "The holy golden potato. Can also be collected through digging.",
-        "emoji": ":potato:"
+        "emoji": "<:golden_potato:1229651438729297932>"
     },
     "invisiblepotato": {
         "name": "Invisible Potato",
@@ -53,15 +53,7 @@
         "sell": 4000,
         "sticky": true,
         "description": "Basically Lay's chips. Can also be collected through digging.",
-        "emoji": ":potato:"
-    },
-    "potatochip": {
-        "name": "Potato Chip",
-        "cost": 10,
-        "sell": 9,
-        "sticky": true,
-        "description": "A single potato chip. Can also be collected through digging.",
-        "emoji": ":potato:"
+        "emoji": "<:invisible_potato:1229652653483491359>"
     },
     "rottenpotato": {
         "name": "Rotten Potato",
