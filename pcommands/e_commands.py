@@ -145,7 +145,7 @@ class EconomyCommands(commands.Cog):
         embed = discord.Embed(description=descrip, color=0x2ECC71)
         await ctx.send(embed=embed)
 
-        await self.addAmountTo(ctx.author, earnings, "wallet")
+        self.addAmountTo(ctx.author, earnings, "wallet")
 
     @beg.error
     async def beg_error(self, ctx: Context, error):
@@ -419,7 +419,15 @@ class EconomyCommands(commands.Cog):
     def getItem(self, itemID: str) -> dict:
         return self.shopItems[itemID]
 
-    async def addAmountTo(self, user: Union[User, Member], change=0, mode="wallet"):
+    def isItemInShop(self, itemID: str) -> bool:
+        """Returns true if itemID corresponds to a shop item"""
+        return itemID in self.shopItems.keys()
+
+    def formatToItemID(self, itemID: str) -> str:
+        """Returns the passed in string all lowercase and without spaces"""
+        return itemID.lower().replace(" ", "")
+
+    def addAmountTo(self, user: Union[User, Member], change=0, mode="wallet"):
         self.getUserBal(user)[mode] += change
 
 
