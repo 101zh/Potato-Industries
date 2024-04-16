@@ -1,4 +1,7 @@
-import discord, json, random
+import discord
+import json
+import random
+import asyncio
 from discord import User, Member
 from discord.ext import commands
 from discord.ext.commands import Context
@@ -12,7 +15,7 @@ import discord.ext.tasks
 class EconomyCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self = self
-        self.bot = bot
+        self.client = bot
         self.usersDataWrapper = usersDataWrapper
 
         with open("assets/dialogue.json", "r") as dJson:
@@ -25,7 +28,8 @@ class EconomyCommands(commands.Cog):
             del dJson
 
         with open("assets/shopitems.json", "r") as sJson:
-            self.shopItems = dict[str, dict[str, Union[str, int]]](json.load(sJson))
+            self.shopItems = dict[str, dict[str, Union[str, int]]](
+                json.load(sJson))
 
         self.hoes = ["diamond hoe", "iron hoe", "stone hoe"]
 
@@ -285,17 +289,18 @@ class EconomyCommands(commands.Cog):
             raise error
 
     @commands.command()
-    async def buy(self, ctx: Context, amount: int, *, itemID: str):
+    async def buy(self, ctx: Context, amount: int = 1, *, itemID: str):
         self.createAccount(ctx.author)
+        itemID = self.formatToItemID(itemID)
+
+        ### Exceptions ###
         if amount <= 0:
             await ctx.send("hey, are you trying to break me?")
             return
-
-        print(itemID)
-        itemID = itemID.lower().replace(" ", "")
-        if itemID not in self.shopItems.keys():
+        if not self.isItemInShop(itemID):
             await ctx.send("That isn't in the shop")
             return
+
         userBalDat = self.getUserBal(ctx.author)
         item = self.getItem(itemID)
         cost = item["cost"] * amount
@@ -308,17 +313,56 @@ class EconomyCommands(commands.Cog):
 
         if cost > userBalDat["wallet"]:
             await ctx.send(
-                f"You don't have enough potatoes in your pocket to purchase {itemMsg} <:XD:806659054721564712>"
+                f"You don't have enough potatoes in your pocket to purchase {
+                    itemMsg} <:XD:806659054721564712>"
             )
             return
 
         userBalDat["wallet"] -= cost
         await ctx.send(f"You just bought {itemMsg} :0")
         await self.addToInv(ctx.author, itemID, amount)
+        del itemID
+        del itemMsg
+        del cost
 
     @commands.command(aliases=["cya"])
-    async def sell(self, ctx: Context, amount=1, *, item):
-        pass
+    async def sell(self, ctx: Context, amount: int = 1, *, itemID: str):
+        self.createAccount(ctx.author)
+        itemID = self.formatToItemID(itemID)
+
+        ### Exceptions ##
+        if amount <= 0:
+            await ctx.send("hey, are you trying to break me?")
+            return
+        elif not self.isItemInShop(itemID):
+            await ctx.send("r u trying to sell nothing?")
+            return
+
+        userInvDat = self.getUserInv(ctx.author)
+        item = self.getItem(itemID)
+
+        if userInvDat[itemID] == None:
+            await ctx.send(f"You don't have {item["name"]} in your shed.")
+            return
+        elif userInvDat[itemID] < amount:
+            await ctx.send(f"You don't have {amount} {item["name"]} in your shed.")
+            return
+
+        itemName = item["name"]
+
+        commission = item["sell"] * amount
+        try:
+            await ctx.send(f"Sell **{amount} {itemName}** for ${commission}?")
+            # Waits for 7.5 seconds
+            response = await self.client.wait_for("message", timeout=7.5)
+        except asyncio.TimeoutError:
+            return
+
+        if response.content.lower() not in ("yes", "y"):
+            return
+
+        await ctx.send(f"You just sold **{amount} {itemName}**")
+        self.addAmountTo(ctx.author, commission, "wallet")
 
     @commands.command()
     async def use(self, ctx: Context, amount_used: int, *, item: Optional[str] = None):
@@ -374,7 +418,7 @@ class EconomyCommands(commands.Cog):
     async def leaderboardreverse(self, ctx: Context):
         pass
 
-    ### Helper Methods
+    # Helper Methods
 
     def getAllUsersData(self) -> dict:
         return self.usersDataWrapper.getAllUserData()
