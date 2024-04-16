@@ -4,62 +4,71 @@
         "cost": 5000,
         "sell": 4500,
         "sticky": false,
-        "description": "Slightly better than the wooden hoe, but still has room for improvement. Farming range is changed from *-50, 50* to *-50, 75*"
+        "description": "Slightly better than the wooden hoe, but still has room for improvement. Farming range is changed from *-50, 50* to *-50, 75*",
+        "emoji": "<:stone_hoe:1229640466769641524>"
     },
     "ironhoe": {
         "name": "Iron hoe",
         "cost": 25000,
         "sell": 22500,
         "sticky": false,
-        "description": "A fast, reliable farming tool. You feel energised when wielding it. Farming range is changed from *-50, 50* to *-25, 75*"
+        "description": "A fast, reliable farming tool. You feel energised when wielding it. Farming range is changed from *-50, 50* to *-25, 75*",
+        "emoji": "<:iron_hoe:1229639613170192416>"
     },
     "diamondhoe": {
         "name": "Diamond hoe",
         "cost": 100000,
         "sell": 90000,
         "sticky": false,
-        "description": "The shimmering blue blade increases your potato farming abilities. Farming range is changed from *-50, 50* to *-25, 100*"
+        "description": "The shimmering blue blade increases your potato farming abilities. Farming range is changed from *-50, 50* to *-25, 100*",
+        "emoji": "<:diamond_hoe:1229214449785765928>"
     },
     "lotterypotato": {
         "name": "Lottery Potato",
         "cost": 5000,
         "sell": 4500,
         "sticky": true,
-        "description": "When used, offers a 5% chance of earning 42069 :potato:. Can also be collected through digging."
+        "description": "When used, offers a 5% chance of earning 42069 :potato:. Can also be collected through digging.",
+        "emoji": "<:lottery_potato:1229642838292172802>"
     },
     "potatotrophy": {
         "name": "Potato Trophy",
         "cost": 5000000,
         "sell": 450000,
         "sticky": false,
-        "description": "Flex your 5mil potatoes with this trophy. Only the rich can afford this."
+        "description": "Flex your 5mil potatoes with this trophy. Only the rich can afford this.",
+        "emoji": "<:potato_trophy:1229643582282137610>"
     },
     "goldenpotato": {
         "name": "Golden Potato",
         "cost": 50000,
         "sell": 45000,
         "sticky": true,
-        "description": "The holy golden potato. Can also be collected through digging."
+        "description": "The holy golden potato. Can also be collected through digging.",
+        "emoji": ""
     },
     "invisiblepotato": {
         "name": "Invisible Potato",
         "cost": 5000,
         "sell": 4000,
         "sticky": true,
-        "description": "Basically Lay's chips. Can also be collected through digging."
+        "description": "Basically Lay's chips. Can also be collected through digging.",
+        "emoji": ""
     },
     "potatochip": {
         "name": "Potato Chip",
         "cost": 10,
         "sell": 9,
         "sticky": true,
-        "description": "A single potato chip. Can also be collected through digging."
+        "description": "A single potato chip. Can also be collected through digging.",
+        "emoji": ""
     },
     "rottenpotato": {
         "name": "Rotten Potato",
         "cost": 5000,
         "sell": 4500,
         "sticky": true,
-        "description": "Why would you buy this. Can also be collected through digging."
+        "description": "Why would you buy this. Can also be collected through digging.",
+        "emoji": "<:rotten_potato:1229216872394915850>"
     }
 }
