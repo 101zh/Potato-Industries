@@ -403,7 +403,7 @@ class EconomyCommands(commands.Cog):
             return
 
         try:
-            getattr(self, "use_" + itemID)()
+            await getattr(self, "use_" + itemID)(ctx, amount)
         except errors.CommandInvokeError:
             await ctx.send("u can't use this item")
 
@@ -459,8 +459,19 @@ class EconomyCommands(commands.Cog):
 
     ### Use Command ###
 
-    def use_lotterypotato(self, ctx: Context, amount: int) -> None:
-        pass
+    async def use_lotterypotato(self, ctx: Context, amount: int) -> None:
+        times_won = 0
+        for i in range(amount):
+            chance = random.randint(0, 100)
+            if chance <= 5:
+                times_won += 1
+
+        if times_won > 0:
+            amount_won = times_won * 42069
+            self.addAmountTo(ctx.author, amount_won)
+            await ctx.send(f"You won the lottery {times_won} times, gaining {amount_won} :potato: congratulations!")
+        else:
+            await ctx.send("Sorry, you didn't win anything")
 
     ### Helper Methods ###
 
