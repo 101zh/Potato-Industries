@@ -327,9 +327,10 @@ class EconomyCommands(commands.Cog):
 
     @buy.error
     async def buy_error(self, ctx: Context, error):
-        await ctx.send(
-            "try formatting it like this: p!buy [amount] [item]"
-        )
+        if isinstance(error, commands.errors.MissingRequiredArgument):
+            await ctx.send("try formatting it like this: `p!buy [amount] [item]`")
+        else:
+            raise error
 
     @commands.command(aliases=["cya"])
     async def sell(self, ctx: Context, amount: int, *, itemID: str):
@@ -373,9 +374,10 @@ class EconomyCommands(commands.Cog):
 
     @sell.error
     async def sell_error(self, ctx: Context, error):
-        await ctx.send(
-            "try formatting it like this: p!sell [amount] [item]"
-        )
+        if isinstance(error, commands.errors.MissingRequiredArgument):
+            await ctx.send("try formatting it like this: `p!sell [amount] [item]`")
+        else:
+            raise error
 
     @commands.command()
     async def use(self, ctx: Context, amount: int, *, itemID: str):
