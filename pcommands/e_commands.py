@@ -325,6 +325,12 @@ class EconomyCommands(commands.Cog):
         del itemMsg
         del cost
 
+    @buy.error
+    async def buy_error(self, ctx: Context, error):
+        await ctx.send(
+            "try formatting it like this: p!buy [amount] [item]"
+        )
+
     @commands.command(aliases=["cya"])
     async def sell(self, ctx: Context, amount: int, *, itemID: str):
         self.createAccount(ctx.author)
@@ -368,7 +374,7 @@ class EconomyCommands(commands.Cog):
     @sell.error
     async def sell_error(self, ctx: Context, error):
         await ctx.send(
-            "try formatting it like this: p!buy [amount] [item]"
+            "try formatting it like this: p!sell [amount] [item]"
         )
 
     @commands.command()
