@@ -4,7 +4,7 @@ import random
 import asyncio
 from discord import User, Member, Message
 from discord.ext import commands
-from discord.ext.commands import Context
+from discord.ext.commands import Context, errors
 from data_wrapper import UsersData, usersDataWrapper
 from typing import Union, Optional
 
@@ -378,11 +378,39 @@ class EconomyCommands(commands.Cog):
         )
 
     @commands.command()
-    async def use(self, ctx: Context, amount_used: int, *, item: Optional[str] = None):
-        pass
+    async def use(self, ctx: Context, amount: int, *, itemID: str):
+        self.createAccount(ctx.author)
+        itemID = self.formatToItemID(itemID)
 
-    async def use_lottery_potato(self, ctx: Context, amount: int) -> None:
-        pass
+        ### Exceptions ##
+        if amount <= 0:
+            await ctx.send("hey, are you trying to break me?")
+            return
+        elif not self.isItemInShop(itemID):
+            await ctx.send("r u trying to use nothing?")
+            return
+
+        userInvDat = self.getUserInv(ctx.author)
+        item = self.getItem(itemID)
+
+        if itemID not in userInvDat.keys():
+            await ctx.send(f"You don't have a {item["name"]} in your shed.")
+            return
+        elif userInvDat[itemID] < amount:
+            await ctx.send(f"You don't have {amount} {item["name"]} in your shed.")
+            return
+
+        try:
+            getattr(self, "use_" + itemID)()
+        except errors.CommandInvokeError:
+            await ctx.send("u can't use this item")
+
+    @use.error
+    async def use_error(self, ctx: Context, error):
+        if isinstance(error, commands.errors.MissingRequiredArgument):
+            await ctx.send("try formatting it like this: `p!use [amount] [item]`")
+        else:
+            raise error
 
     @commands.command(aliases=["gift", "gib", "send", "transfer"])
     async def give(self, ctx: Context, member: Union[User, Member], amount=None):
@@ -427,7 +455,12 @@ class EconomyCommands(commands.Cog):
     async def leaderboardreverse(self, ctx: Context):
         pass
 
-    # Helper Methods
+    ### Use Command ###
+
+    def use_lotterypotato(self, ctx: Context, amount: int) -> None:
+        pass
+
+    ### Helper Methods ###
 
     def getAllUsersData(self) -> dict:
         return self.usersDataWrapper.getAllUserData()
