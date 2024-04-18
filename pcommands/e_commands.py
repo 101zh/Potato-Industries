@@ -347,8 +347,8 @@ class EconomyCommands(commands.Cog):
         userInvDat = self.getUserInv(ctx.author)
         item = self.getItem(itemID)
 
-        if userInvDat[itemID] == None:
-            await ctx.send(f"You don't have {item["name"]} in your shed.")
+        if itemID not in userInvDat.keys():
+            await ctx.send(f"You don't have a {item["name"]} in your shed.")
             return
         elif userInvDat[itemID] < amount:
             await ctx.send(f"You don't have {amount} {item["name"]} in your shed.")
