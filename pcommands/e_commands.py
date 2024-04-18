@@ -2,7 +2,7 @@ import discord
 import json
 import random
 import asyncio
-from discord import User, Member
+from discord import User, Member, Message
 from discord.ext import commands
 from discord.ext.commands import Context
 from data_wrapper import UsersData, usersDataWrapper
@@ -326,7 +326,7 @@ class EconomyCommands(commands.Cog):
         del cost
 
     @commands.command(aliases=["cya"])
-    async def sell(self, ctx: Context, amount: int = 1, *, itemID: str):
+    async def sell(self, ctx: Context, amount: int, *, itemID: str):
         self.createAccount(ctx.author)
         itemID = self.formatToItemID(itemID)
 
@@ -352,27 +352,30 @@ class EconomyCommands(commands.Cog):
 
         commission = item["sell"] * amount
         try:
-            await ctx.send(f"Sell **{amount} {itemName}** for ${commission}?")
+            await ctx.send(f"Sell **{amount} {itemName}** for {commission} :potato:? (y/n)")
             # Waits for 7.5 seconds
-            response = await self.client.wait_for("message", timeout=7.5)
+            response: Message = await self.client.wait_for("message", timeout=7.5)
         except asyncio.TimeoutError:
             return
 
         if response.content.lower() not in ("yes", "y"):
+            await ctx.send("Sale cancelled")
             return
 
-        await ctx.send(f"You just sold **{amount} {itemName}**")
+        await ctx.send(f"You just sold **{amount} {itemName}** for {commission} :potato:")
         self.addAmountTo(ctx.author, commission, "wallet")
+
+    @sell.error
+    async def sell_error(self, ctx: Context, error):
+        await ctx.send(
+            "try formatting it like this: p!buy [amount] [item]"
+        )
 
     @commands.command()
     async def use(self, ctx: Context, amount_used: int, *, item: Optional[str] = None):
         pass
 
     async def use_lottery_potato(self, ctx: Context, amount: int) -> None:
-        pass
-
-    @sell.error
-    async def sell_error(self, ctx: Context, error):
         pass
 
     @commands.command(aliases=["gift", "gib", "send", "transfer"])
